@@ -1,0 +1,48 @@
+# pull official base image
+FROM python:3.8.3-slim-buster
+
+# set work directory
+WORKDIR /usr/src/app
+
+# set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+RUN apt-get update
+
+RUN apt-get install -y --no-install-recommends \
+    # gcc python3-dev musl-dev \
+    # build-base py-pip jpeg-dev zlib-dev \
+    libpcre3 libpcre3-dev \
+    libatlas-base-dev gfortran nginx supervisor
+
+# ENV LIBRARY_PATH=/lib:/usr/lib
+
+# upgrade pip
+RUN pip install --upgrade pip
+
+# install WSGI server
+RUN pip install uwsgi
+
+# install python dependencies
+COPY ./requirements.txt .
+RUN pip install -r requirements.txt
+
+# create user `nginx`
+RUN useradd --no-create-home nginx
+
+# remove nginx default files
+RUN rm /etc/nginx/sites-enabled/default
+RUN rm -r /root/.cache
+
+# copy in server config
+COPY server-config/nginx.conf /etc/nginx/
+COPY server-config/site-nginx.conf /etc/nginx/conf.d/
+COPY server-config/uwsgi.ini /etc/uwsgi/
+COPY server-config/supervisord.conf /etc/supervisor/
+
+# copy in project
+COPY . .
+
+# run supervisor setup
+CMD ["/usr/bin/supervisord"]

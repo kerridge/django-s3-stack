@@ -1,0 +1,29 @@
+version: '3.7'
+
+services:
+    app:
+        build:
+            context: ./api
+            dockerfile: Dockerfile.prod
+        ports:
+        - "5010:80"
+        volumes:
+        - ./api/:/usr/src/app/
+        env_file:
+        - ./.env.dev
+        environment:
+        - DJANGO_SETTINGS_MODULE=headless_test.settings.dev
+        depends_on:
+        - db        
+
+    db:
+        image: postgres:12.0-alpine
+        volumes:
+            - postgres_data:/var/lib/postgresql/data/
+        environment:
+            - POSTGRES_USER=hello_django
+            - POSTGRES_PASSWORD=hello_django
+            - POSTGRES_DB=hello_django_dev
+    
+volumes:
+    postgres_data:
