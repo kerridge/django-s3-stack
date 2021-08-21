@@ -9,6 +9,7 @@ services:
         - "5010:80"
         volumes:
         - ./api/:/usr/src/app/
+
         env_file:
         - ./.env.dev
         environment:
