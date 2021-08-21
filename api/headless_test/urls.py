@@ -15,18 +15,11 @@ from django.contrib.staticfiles.views import serve
 from django.views.generic import RedirectView
 
 
-
 urlpatterns = [
     path('django-admin/', admin.site.urls),
     path('admin/', include(wagtailadmin_urls)),
 
     path('search/', search_views.search, name='search'),
-
-    # static files (*.css, *.js, *.jpg etc.) served on /
-    # (assuming Django uses /static/ and /media/ for static/media urls)
-    # url(r'^bitch/', serve, kwargs={'path': 'dist/index.html'}),
-    # url(r'^(?!/?static/)(?!/?media/)(?P<path>.*\..*)$',
-    #     RedirectView.as_view(url='/static/%(path)s', permanent=False)),
 
     path('api/', api_router.urls),
     path('api/v2/', include(router.urls)),

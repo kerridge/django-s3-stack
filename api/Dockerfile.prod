@@ -13,7 +13,7 @@ RUN apt-get update
 RUN apt-get install -y --no-install-recommends \
     # gcc python3-dev musl-dev \
     # build-base py-pip jpeg-dev zlib-dev \
-    libpcre3 libpcre3-dev \
+    libpcre3 libpcre3-dev netcat \
     libatlas-base-dev gfortran nginx supervisor
 
 # ENV LIBRARY_PATH=/lib:/usr/lib
@@ -46,3 +46,6 @@ COPY . .
 
 # run supervisor setup
 CMD ["/usr/bin/supervisord"]
+
+# run entrypoint.sh
+ENTRYPOINT ["/usr/src/app/entrypoint.sh"]

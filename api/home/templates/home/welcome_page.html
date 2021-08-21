@@ -7,9 +7,6 @@
     </a>
   </div>
   <div class="header-link">
-    {% comment %}
-      This works for all cases but prerelease versions:
-    {% endcomment %}
     <a href="{% wagtail_documentation_path %}/releases/{% wagtail_release_notes_path %}">
       {% trans "View the release notes" %}
     </a>
@@ -23,8 +20,11 @@
     </svg>
   </div>
   <div class="main-text">
-    <h1>{% trans "Welcome to your new Wagtail site!?" %}</h1>
+    <h1>"Welcome to your new Wagtail site!?"</h1>
     <p>{% trans 'Please feel free to <a href="https://github.com/wagtail/wagtail/wiki/Slack">join our community on Slack</a>, or get started with one of the links below.' %}</p>
+    <div>
+      <p id="supbitch">SUP BITCH</p>
+    </div>
   </div>
 </main>
 <footer class="footer" role="contentinfo">
