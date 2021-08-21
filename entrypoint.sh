@@ -12,7 +12,7 @@ then
 fi
 
 # python manage.py flush --no-input
-python manage.py migrate
-python manage.py collectstatic --noinput
+python api/manage.py migrate
+python api/manage.py collectstatic --noinput
 
 exec "$@"

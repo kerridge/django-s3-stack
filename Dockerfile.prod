@@ -25,7 +25,7 @@ RUN pip install --upgrade pip
 RUN pip install uwsgi
 
 # install python dependencies
-COPY ./requirements.txt .
+COPY api/requirements.txt .
 RUN pip install -r requirements.txt
 
 # create user `nginx`
@@ -41,8 +41,10 @@ COPY server-config/site-nginx.conf /etc/nginx/conf.d/
 COPY server-config/uwsgi.ini /etc/uwsgi/
 COPY server-config/supervisord.conf /etc/supervisor/
 
+COPY /entrypoint.sh /usr/src/app
+
 # copy in project
-COPY . .
+COPY api .
 
 # run supervisor setup
 CMD ["/usr/bin/supervisord"]
