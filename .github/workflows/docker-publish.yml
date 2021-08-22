@@ -35,23 +35,7 @@ jobs:
 
       - name: check modified files
         id: check_files
-        run: |
-          echo "=============== list modified files ==============="
-          git diff --name-only HEAD^ HEAD
-          
-          echo "========== check paths of modified files =========="
-          git diff --name-only HEAD^ HEAD > files.txt
-          while IFS= read -r file
-          do
-            echo $file
-            if [[ $file != api/* ]]; then
-              echo "This modified file is not under the 'api' folder."
-              echo "::set-output name=run_job::false"
-              break
-            else
-              echo "::set-output name=run_job::true"
-            fi
-          done < files.txt
+        run: /util/is_subdirectory.sh ${{ env.TRIGGER_DIRECTORY }}
 
   job_for_db:
     name: Job for 'api' folder
@@ -59,8 +43,8 @@ jobs:
     if: needs.check.outputs.run_job == 'true'
     runs-on: ubuntu-latest
     steps:
-      - name: run for 'api' folder
-        run: echo "This job runs only when all the modified files are under the 'api' folder."
+      - name: run for '${{ env.TRIGGER_DIRECTORY }}' folder
+        run: echo "This job runs only when all the modified files are under the '${{ env.TRIGGER_DIRECTORY }}' folder."
 
   build:
     runs-on: ubuntu-latest
