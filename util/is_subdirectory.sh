@@ -13,6 +13,8 @@ do
         echo "::set-output name=run_job::false"
         break
     else
+        echo "This modified file IS under the '$1' folder."
         echo "::set-output name=run_job::true"
+        break
     fi
 done < files.txt

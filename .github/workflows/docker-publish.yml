@@ -47,6 +47,7 @@ jobs:
         run: echo "This job runs only when all the modified files are under the '${{ env.TRIGGER_DIRECTORY }}' folder."
 
   build:
+    needs: check
     runs-on: ubuntu-latest
     permissions:
       contents: read
