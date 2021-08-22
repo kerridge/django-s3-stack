@@ -18,7 +18,7 @@ on:
 env:
   REGISTRY: docker.io
   IMAGE_NAME: ${{ secrets.DOCKER_HUB_USERNAME }}/django-s3-stack
-  TRIGGER_DIRECTORY: api/
+  TRIGGER_DIRECTORY: api
 
 
 jobs:
@@ -28,23 +28,15 @@ jobs:
       run_job: ${{ steps.check_files.outputs.run_job }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout codea
         uses: actions/checkout@v2
         with:
-          fetch-depth: 3
+          fetch-depth: 0
 
-      - name: Check modified files
+      - name: Check if modified files in project subdirectory
         id: check_files
-        run: ./util/is_subdirectory.sh ${{ env.TRIGGER_DIRECTORY }}
+        run: ./util/if_file_in_subdirectory.sh ${{ env.TRIGGER_DIRECTORY }}
 
-  job_for_db:
-    name: Job for 'api' folder
-    needs: check
-    if: needs.check.outputs.run_job == 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - name: run for '${{ env.TRIGGER_DIRECTORY }}' folder
-        run: echo "This job runs only when all the modified files are under the '${{ env.TRIGGER_DIRECTORY }}' folder."
 
   build:
     needs: check
@@ -104,8 +96,12 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps: 
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      # - name: Checkout repository
+      #   uses: actions/checkout@v2
+      
+      - use: Bhacaz/checkout-files
+      with:
+        files: ./app.yaml
         
       - name: Publish app to Digital Ocean
         if: github.event_name != 'pull_request'
