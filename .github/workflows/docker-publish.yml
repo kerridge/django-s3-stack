@@ -102,7 +102,7 @@ jobs:
       - name: Checkout app.yaml
         uses: Bhacaz/checkout-files@v1
         with:
-          files: ./app.yaml
+          files: app.yaml
           token: ${{ secrets.GH_ACTIONS_READ_ONLY }}
         
       - name: Publish app to Digital Ocean
