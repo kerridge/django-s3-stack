@@ -10,7 +10,7 @@ services:
   - key: DEBUG
     scope: RUN_AND_BUILD_TIME
     type: GENERAL
-    value: 1
+    value: true
 
   - key: DATABASE
     scope: RUN_AND_BUILD_TIME
@@ -21,7 +21,7 @@ services:
     scope: RUN_AND_BUILD_TIME
     type: GENERAL
     value: headless_test.settings.dev
-    
+
   - key: DJANGO_ALLOWED_HOSTS
     scope: RUN_AND_BUILD_TIME
     type: GENERAL
