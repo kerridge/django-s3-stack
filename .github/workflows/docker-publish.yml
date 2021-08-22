@@ -100,7 +100,7 @@ jobs:
       #   uses: actions/checkout@v2
       
       - name: Checkout app.yaml
-        uses: Bhacaz/checkout-files
+        uses: Bhacaz/checkout-files@v1
         with:
           files: ./app.yaml
         
