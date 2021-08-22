@@ -35,7 +35,7 @@ jobs:
 
       - name: check modified files
         id: check_files
-        run: /util/is_subdirectory.sh ${{ env.TRIGGER_DIRECTORY }}
+        run: ./util/is_subdirectory.sh ${{ env.TRIGGER_DIRECTORY }}
 
   job_for_db:
     name: Job for 'api' folder
