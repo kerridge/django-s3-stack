@@ -1,5 +1,7 @@
 #!/bin/bash
 
+search_dir=$1
+
 echo "=============== list modified files ==============="
 git diff --name-only HEAD^ HEAD
 
@@ -9,12 +11,13 @@ while IFS= read -r file
 do
     echo $file
     if [[ $file != $1/** ]]; then
-        echo "This modified file is not under the '$1' folder."
-        echo "::set-output name=run_job::false"
-        break
-    else
+    if [[ $(find "$search_dir" -name "$file") ]]; then
         echo "This modified file IS under the '$1' folder."
         echo "::set-output name=run_job::true"
+        break
+    else
+        echo "This modified file is not under the '$1' folder."
+        echo "::set-output name=run_job::false"
         break
     fi
 done < files.txt

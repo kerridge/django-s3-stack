@@ -31,9 +31,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
         with:
-          fetch-depth: 2
+          fetch-depth: 3
 
-      - name: check modified files
+      - name: Check modified files
         id: check_files
         run: ./util/is_subdirectory.sh ${{ env.TRIGGER_DIRECTORY }}
 
@@ -48,6 +48,7 @@ jobs:
 
   build:
     needs: check
+    if: needs.check.outputs.run_job == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
