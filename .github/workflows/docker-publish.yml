@@ -85,4 +85,4 @@ jobs:
         with:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
           app-id: django-s3-stack
-          spec: app.yaml
+          spec: /app.yaml
