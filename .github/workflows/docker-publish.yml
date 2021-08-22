@@ -1,9 +1,4 @@
-name: Docker build & publish
-
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
+name: Build Docker container & deploy to Digital Ocean
 
 on:
   schedule:
@@ -18,27 +13,27 @@ on:
 env:
   REGISTRY: docker.io
   IMAGE_NAME: ${{ secrets.DOCKER_HUB_USERNAME }}/django-s3-stack
-  TRIGGER_DIRECTORY: api
-
+  TRIGGER_DIRECTORIES: api .github server-config util
 
 jobs:
   check:
-    name: Check files
+    name: Trigger build if matching files modified
     outputs:
       run_job: ${{ steps.check_files.outputs.run_job }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout codea
+      - name: Checkout code
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
 
       - name: Check if modified files in project subdirectory
         id: check_files
-        run: ./util/if_file_in_subdirectory.sh ${{ env.TRIGGER_DIRECTORY }}
+        run: ./util/if_file_in_subdirectory.sh ${{ env.TRIGGER_DIRECTORIES }}
 
 
   build:
+    name: Build and cache container
     needs: check
     if: needs.check.outputs.run_job == 'true'
     runs-on: ubuntu-latest
@@ -93,12 +88,10 @@ jobs:
           cache-to: type=local,dest=/tmp/.buildx-cache
 
   publish:
+    name: Publish app to Digital Ocean app platform
     needs: build
     runs-on: ubuntu-latest
     steps: 
-      # - name: Checkout repository
-      #   uses: actions/checkout@v2
-      
       - name: Checkout app.yaml
         uses: Bhacaz/checkout-files@v1
         with:
