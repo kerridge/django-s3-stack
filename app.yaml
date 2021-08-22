@@ -12,16 +12,16 @@ services:
     value: EV[1:QNw/vmjyDvujwhtJct0gnSxOamaLkCJF:MLGXakaSQVCukGP9BbUElRcybMx/+qKCCZA=]
   - key: DATABASE
     scope: RUN_AND_BUILD_TIME
-    type: SECRET
-    value: EV[1:SEoaazBoUj2W9wJQ7PDW0Swqn170GKJz:UK189MSRz1rw4SJHRFBJbPo6IhABO4k=]
-  - key: DJANGO_ALLOWED_HOSTS
-    scope: RUN_AND_BUILD_TIME
-    type: SECRET
-    value: EV[1:MgTXC4/XhGxMeym0HUJLuz0o3dbc6S+3:4V7lqa81/9VZW6v8TdV/hD04me8XbYqQzeQJgACLxF09F/fKZM/CxKxS/Wfh5Be+iA==]
+    type: GENERAL
+    value: sqlite3
   - key: DJANGO_SETTINGS_MODULE
     scope: RUN_AND_BUILD_TIME
     type: GENERAL
     value: headless_test.settings.dev
+  - key: DJANGO_ALLOWED_HOSTS
+    scope: RUN_AND_BUILD_TIME
+    type: GENERAL
+    value: .ondigitalocean.app [::1]
   http_port: 80
   image:
     registry: samkedge
