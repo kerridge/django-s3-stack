@@ -9,6 +9,7 @@ echo "========== check paths of modified files =========="
 git diff --name-only HEAD^ HEAD > files.txt
 while IFS= read -r file
 do
+    pwd
     echo $file
     if [[ $(find "$search_dir" -name "$file") ]]; then
         echo "This modified file IS under the '$1' folder."
