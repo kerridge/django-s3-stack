@@ -10,7 +10,7 @@ services:
   - key: DEBUG
     scope: RUN_AND_BUILD_TIME
     type: GENERAL
-    value: 'True'
+    value: '1'
 
   - key: DATABASE
     scope: RUN_AND_BUILD_TIME
