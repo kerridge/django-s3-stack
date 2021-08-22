@@ -10,7 +10,6 @@ git diff --name-only HEAD^ HEAD > files.txt
 while IFS= read -r file
 do
     echo $file
-    if [[ $file != $1/** ]]; then
     if [[ $(find "$search_dir" -name "$file") ]]; then
         echo "This modified file IS under the '$1' folder."
         echo "::set-output name=run_job::true"
