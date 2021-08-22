@@ -22,7 +22,7 @@ services:
     scope: RUN_AND_BUILD_TIME
     type: GENERAL
     value: headless_test.settings.dev
-  http_port: 5010
+  http_port: 80
   image:
     registry: samkedge
     registry_type: DOCKER_HUB
@@ -33,6 +33,4 @@ services:
   name: django-s3-stack
   routes:
   - path: /
-  - path: /api
-  - path: /admin
   source_dir: /
