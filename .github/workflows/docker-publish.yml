@@ -80,3 +80,9 @@ jobs:
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
 
+      - name: Publish to Digital Ocean
+        uses: jjst/action-digitalocean-deploy-app@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+          app-id: django-s3-stack
+          spec: ./app.yaml

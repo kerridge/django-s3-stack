@@ -1,0 +1,38 @@
+name: django-s3-stack
+region: sgp
+services:
+- envs:
+  - key: DEBUG
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+    value: EV[1:KI1PuKUnWI7OM2Q7EWCqHF6Os9B3TXUu:RwshPow8wZ1yvwl3CIjEoiA=]
+  - key: SECRET_KEY
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+    value: EV[1:QNw/vmjyDvujwhtJct0gnSxOamaLkCJF:MLGXakaSQVCukGP9BbUElRcybMx/+qKCCZA=]
+  - key: DATABASE
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+    value: EV[1:SEoaazBoUj2W9wJQ7PDW0Swqn170GKJz:UK189MSRz1rw4SJHRFBJbPo6IhABO4k=]
+  - key: DJANGO_ALLOWED_HOSTS
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+    value: EV[1:MgTXC4/XhGxMeym0HUJLuz0o3dbc6S+3:4V7lqa81/9VZW6v8TdV/hD04me8XbYqQzeQJgACLxF09F/fKZM/CxKxS/Wfh5Be+iA==]
+  - key: DJANGO_SETTINGS_MODULE
+    scope: RUN_AND_BUILD_TIME
+    type: GENERAL
+    value: headless_test.settings.dev
+  http_port: 5010
+  image:
+    registry: samkedge
+    registry_type: DOCKER_HUB
+    repository: django-s3-stack
+    tag: main
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  name: django-s3-stack
+  routes:
+  - path: /
+  - path: /api
+  - path: /admin
+  source_dir: /
