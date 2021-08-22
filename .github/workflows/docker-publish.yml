@@ -99,9 +99,10 @@ jobs:
       # - name: Checkout repository
       #   uses: actions/checkout@v2
       
-      - use: Bhacaz/checkout-files
-      with:
-        files: ./app.yaml
+      - name: Checkout app.yaml
+        uses: Bhacaz/checkout-files
+        with:
+          files: ./app.yaml
         
       - name: Publish app to Digital Ocean
         if: github.event_name != 'pull_request'
