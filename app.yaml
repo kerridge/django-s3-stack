@@ -2,22 +2,26 @@ name: django-s3-stack
 region: sgp
 services:
 - envs:
-  - key: DEBUG
-    scope: RUN_AND_BUILD_TIME
-    type: SECRET
-    value: EV[1:KI1PuKUnWI7OM2Q7EWCqHF6Os9B3TXUu:RwshPow8wZ1yvwl3CIjEoiA=]
   - key: SECRET_KEY
     scope: RUN_AND_BUILD_TIME
     type: SECRET
     value: EV[1:QNw/vmjyDvujwhtJct0gnSxOamaLkCJF:MLGXakaSQVCukGP9BbUElRcybMx/+qKCCZA=]
+
+  - key: DEBUG
+    scope: RUN_AND_BUILD_TIME
+    type: GENERAL
+    value: 1
+
   - key: DATABASE
     scope: RUN_AND_BUILD_TIME
     type: GENERAL
     value: sqlite3
+
   - key: DJANGO_SETTINGS_MODULE
     scope: RUN_AND_BUILD_TIME
     type: GENERAL
     value: headless_test.settings.dev
+    
   - key: DJANGO_ALLOWED_HOSTS
     scope: RUN_AND_BUILD_TIME
     type: GENERAL
