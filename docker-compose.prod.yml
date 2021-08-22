@@ -11,3 +11,11 @@ services:
         - ./:/usr/src/app/
         env_file:
         - ./.env.prod
+
+        test: &test
+            <<: *default
+            command: echo 'yo'
+
+        ci:
+            <<: *test
+            volumes: []
