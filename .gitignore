@@ -129,7 +129,7 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-.env.*
+.env.prod
 **/static/**
 **/static/css/
 **/static/js/
