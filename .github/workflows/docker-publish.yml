@@ -77,10 +77,9 @@ jobs:
       - name: Build Docker and publish Docker image
         id: docker_build
         uses: docker/build-push-action@v2
-        working-directory: ./api
         with:
           context: .
-          file: Dockerfile.prod
+          file: api/Dockerfile.prod
           builder: ${{ steps.buildx.outputs.name }}
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
