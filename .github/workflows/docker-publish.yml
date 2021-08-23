@@ -1,4 +1,4 @@
-name: Build Docker container & deploy to Digital Ocean
+name: Build & Deploy
 
 on:
   schedule:
@@ -74,19 +74,30 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
-      - name: where am i
-        run: ls && pwd
+      # Run test target inside Docker container
+      - name: Test
+        id: docker_test
+        uses: docker/build-push-action@v2
+        with:
+          context: ./api
+          file: ./api/Dockerfile.prod
+          target: test
+          builder: ${{ steps.buildx.outputs.name }}
+          push: false
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
 
-      - name: Build Docker and publish Docker image
+
+      - name: Build & push
         id: docker_build
         uses: docker/build-push-action@v2
         with:
           context: ./api
           file: ./api/Dockerfile.prod
+          target: prod
           builder: ${{ steps.buildx.outputs.name }}
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
 

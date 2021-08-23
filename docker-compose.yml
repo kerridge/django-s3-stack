@@ -7,11 +7,9 @@ services:
     volumes:
       - ./api/:/usr/src/app/
     ports:
-      - 8000:8000
+      - 5010:8000
     env_file:
       - ./.env.dev
-    environment:
-      - DJANGO_SETTINGS_MODULE=headless_test.settings.dev
     depends_on:
       - db
 

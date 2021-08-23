@@ -12,6 +12,7 @@ then
 fi
 
 # python manage.py flush --no-input
+python src/manage.py makemigrations
 python src/manage.py migrate
 python src/manage.py collectstatic --noinput
 

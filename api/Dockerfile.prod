@@ -1,5 +1,7 @@
-# pull official base image
-FROM python:3.8.3-slim-buster
+# ====================================
+# ============== BASE ================
+# ====================================
+FROM python:3.8.3-slim-buster as base
 
 # set work directory
 WORKDIR /usr/src/app
@@ -7,6 +9,36 @@ WORKDIR /usr/src/app
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
+
+# ENV LIBRARY_PATH=/lib:/usr/lib
+
+# upgrade pip
+RUN pip install --upgrade pip
+
+# install python dependencies
+COPY src/requirements.txt .
+RUN pip install -r requirements.txt
+
+# copy in project
+COPY src src/
+
+
+# ====================================
+# ============== TEST ================
+# ====================================
+FROM base as test
+
+# set work directory
+WORKDIR /usr/src/app/src
+
+# run tests
+RUN python3 ./manage.py test
+
+
+# ====================================
+# ============== PROD ================
+# ====================================
+FROM base as prod
 
 RUN apt-get update
 
@@ -16,17 +48,8 @@ RUN apt-get install -y --no-install-recommends \
     libpcre3 libpcre3-dev netcat \
     libatlas-base-dev gfortran nginx supervisor
 
-# ENV LIBRARY_PATH=/lib:/usr/lib
-
-# upgrade pip
-RUN pip install --upgrade pip
-
 # install WSGI server
 RUN pip install uwsgi
-
-# install python dependencies
-COPY src/requirements.txt .
-RUN pip install -r requirements.txt
 
 # create user `nginx`
 RUN useradd --no-create-home nginx
@@ -42,9 +65,6 @@ COPY server-config/uwsgi.ini /etc/uwsgi/
 COPY server-config/supervisord.conf /etc/supervisor/
 
 COPY /entrypoint.sh /usr/src/app
-
-# copy in project
-COPY src src/
 
 # run supervisor setup
 CMD ["/usr/bin/supervisord"]

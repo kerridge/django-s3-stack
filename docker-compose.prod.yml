@@ -4,6 +4,7 @@ services:
     app: &default
         build:
             context: ./api
+            target: prod
             dockerfile: Dockerfile.prod
         ports:
         - "5010:80"
@@ -11,8 +12,11 @@ services:
         - ./api/.env.prod
 
     test: &test
-        <<: *default
-        command: echo 'yo'
+        # command: echo '======== Running tests =========='
+        build:
+            context: ./api
+            target: test
+            dockerfile: Dockerfile.prod
 
     ci:
         <<: *test
