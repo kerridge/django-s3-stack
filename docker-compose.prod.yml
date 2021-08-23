@@ -12,12 +12,7 @@ services:
         - ./api/.env.prod
 
     test: &test
-        # command: echo '======== Running tests =========='
         build:
             context: ./api
             target: test
             dockerfile: Dockerfile.prod
-
-    ci:
-        <<: *test
-        volumes: []
