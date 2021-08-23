@@ -8,4 +8,4 @@ class TodoTestCase(TestCase):
     def test_todo_exists(self):
         """Todos created are correctly identified"""
         todo = Todo.objects.get(todo_title='test title')
-        self.assertEqual(todo.todo_description, 'test decrisption')
+        self.assertEqual(todo.todo_description, 'test decription')
