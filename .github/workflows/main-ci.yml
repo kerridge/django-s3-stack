@@ -75,7 +75,7 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
       # Run test target inside Docker container
-      - name: Test
+      - name: Django Test
         id: docker_test
         uses: docker/build-push-action@v2
         with:
