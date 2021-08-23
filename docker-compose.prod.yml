@@ -3,14 +3,12 @@ version: '3.7'
 services:
     app: &default
         build:
-            context: ./
+            context: ./api
             dockerfile: Dockerfile.prod
         ports:
         - "5010:80"
-        volumes:
-        - ./:/usr/src/app/
         env_file:
-        - ./.env.prod
+        - ./api/.env.prod
 
     test: &test
         <<: *default

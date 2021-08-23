@@ -13,11 +13,11 @@ on:
 env:
   REGISTRY: docker.io
   IMAGE_NAME: ${{ secrets.DOCKER_HUB_USERNAME }}/django-s3-stack
-  TRIGGER_DIRECTORIES: api .github server-config util
+  TRIGGER_DIRECTORIES: api .github util
 
 jobs:
   check:
-    name: Trigger build if matching files modified
+    name: Check for changes
     outputs:
       run_job: ${{ steps.check_files.outputs.run_job }}
     runs-on: ubuntu-latest
@@ -29,11 +29,11 @@ jobs:
 
       - name: Check if modified files in project subdirectory
         id: check_files
-        run: ./util/if_file_in_subdirectory.sh ${{ env.TRIGGER_DIRECTORIES }}
+        run: ./util/if_changes_in_subdirectory.sh ${{ env.TRIGGER_DIRECTORIES }}
 
 
   build:
-    name: Build and cache container
+    name: Build container
     needs: check
     if: needs.check.outputs.run_job == 'true'
     runs-on: ubuntu-latest
@@ -88,14 +88,14 @@ jobs:
           cache-to: type=local,dest=/tmp/.buildx-cache
 
   publish:
-    name: Publish app to Digital Ocean app platform
+    name: Publish to Digital Ocean
     needs: build
     runs-on: ubuntu-latest
     steps: 
       - name: Checkout app.yaml
         uses: Bhacaz/checkout-files@v1
         with:
-          files: app.yaml
+          files: api/app.yaml
           token: ${{ secrets.GH_ACTIONS_READ_ONLY }}
         
       - name: Publish app to Digital Ocean
@@ -104,4 +104,4 @@ jobs:
         with:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
           app-id: ${{ secrets.DIGITALOCEAN_APP_ID }}
-          spec: ./app.yaml
+          spec: api/app.yaml
