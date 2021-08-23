@@ -18,6 +18,10 @@ RUN pip install --upgrade pip
 COPY ./src/requirements.txt .
 RUN pip install -r requirements.txt
 
+# install dev dependencies
+COPY ./src/requirements.dev.txt .
+RUN pip install -r requirements.dev.txt
+
 COPY ./entrypoint.sh .
 
 # copy project
