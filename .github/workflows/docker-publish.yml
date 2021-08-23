@@ -74,11 +74,14 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
+      - name: where am i
+        run: ls && pwd
+
       - name: Build Docker and publish Docker image
         id: docker_build
         uses: docker/build-push-action@v2
         with:
-          context: ~/api
+          context: ./api
           file: Dockerfile.prod
           builder: ${{ steps.buildx.outputs.name }}
           push: ${{ github.event_name != 'pull_request' }}
