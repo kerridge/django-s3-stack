@@ -1,0 +1,84 @@
+name: Create VPS instance using VultrCLI
+
+on: 
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'     
+        required: false
+        default: 'warning'
+
+env:
+  VULTR_VPS_REGION: syd
+  VULTR_VPS_PLAN: vc2-1c-1gb
+  VULTR_VPS_OS_IMAGE: 186 # CentOS
+  VULTR_VPS_NAME: django-vue-stack
+  VULTR_APP_ID: 17 # Docker
+
+  SSH_EMAIL: sammykerridge@gmail.com
+
+jobs:
+  ssh:
+    name: Generate and store SSH keys
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate new SSH key pair
+        run: ssh-keygen -t ed25519 -C "${{ env.SSH_EMAIL }}" -q -N ""
+
+      - name: Add SSH public key to Github Secrets
+        uses: gliech/create-github-secret-action@v1
+        with:
+          name: VULTR_SSH_PUBLIC_KEY
+          value: ~/.ssh/id_ed25519.pub
+          pa_token: ${{ secrets.GH_PA_TOKEN }}
+
+      - name: Add SSH private key to Github Secrets
+        uses: gliech/create-github-secret-action@v1
+        with:
+          name: VULTR_SSH_PRIVATE_KEY
+          value: ~/.ssh/id_ed25519
+          pa_token: ${{ secrets.GH_PA_TOKEN }}
+
+  vultr:
+    name: Deploy Vultr VPS Instance
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install vultr-cli
+        uses: techknowlogick/action-vultr@v2
+        with:
+          token: ${{ secrets.VULTR_API_KEY }}
+
+      - name: Checkout test.sh startup script
+        uses: Bhacaz/checkout-files@v1
+        with:
+          files: ./test.sh
+          token: ${{ secrets.GH_ACTIONS_READ_ONLY }}
+
+      - name: Push startup script using vultr-cli
+        id: push-startup-script
+        run: |
+          vultr-cli script list
+
+          # base64 encode our script
+          SCRIPT=`base64 ./test.sh`
+          vultr-cli script create \
+            --name ${{ env.VULTR_VPS_NAME }} \
+            --type boot \
+            --script $SCRIPT
+
+          SCRIPT_ID=$(vultr-cli script list |  awk '/${{ env.VULTR_VPS_NAME }}/ { print $1 }')
+          echo "::set-output name=SCRIPT_ID::$SCRIPT_ID"
+
+      # - name: Create instance using vultr-cli
+      #   id: create-new-instance
+      #   run: |
+      #     vultr-cli instance list
+      #     vultr-cli instance create \
+      #     --region ${{ env.VULTR_VPS_REGION }} \
+      #     --plan ${{ env.VULTR_VPS_PLAN }} \
+      #     --os ${{ env.VULTR_VPS_OS_IMAGE }} \
+      #     --app ${{ env.VULTR_VPS_APP_ID }} \
+      #     --label ${{ env.VULTR_VPS_NAME }} \
+      #     --script-id ${{ steps.push-startup-script.outputs.SCRIPT_ID }}
+      #     --ipv6 false
+

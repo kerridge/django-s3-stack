@@ -24,5 +24,3 @@ jobs:
         script: |
           cd ${{ env.PROJ_DIR }}
           ${{ env.DEPLOY_SCRIPT }} ${{ github.event.repository.git_url }} ${{ github.event.repository.name }} ${{ github.repository_owner }} ${{ secrets.GH_ACTIONS_READ_ONLY }}
-        
-          
