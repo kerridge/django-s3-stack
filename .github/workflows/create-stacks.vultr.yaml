@@ -23,11 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Generate new SSH key pair
-        run: ssh-keygen \
-          -t ed25519 \
-          -f ~/.ssh/id_ed25519 \
-          -C "${{ env.SSH_EMAIL }}" \
-          -q -N ""
+        run: ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -C "${{ env.SSH_EMAIL }}" -q -N ""
 
       - name: Add SSH public key to Github Secrets
         uses: gliech/create-github-secret-action@v1
