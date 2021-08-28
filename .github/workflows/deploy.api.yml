@@ -4,10 +4,6 @@ on:
   push:
     branches: [ vultr ]
 
-env:
-  SERVER_IP: 149.28.180.213
-  USER: root
-
 jobs:
   deploy:
     name: Run deploy script via SSH
@@ -15,12 +11,16 @@ jobs:
     steps:
     - name: executing remote ssh script using private key
       uses: appleboy/ssh-action@master
+      env:
+        SERVER_IP: 149.28.180.213
+        USER: root
+        PROJ_DIR: "/home/docker/proj/django-s3-stack"
       with:
         host: ${{ env.SERVER_IP }}
         username: ${{ env.USER }}
         key: ${{ secrets.WORK_MAC_SSH_PRIVATE }}
         script_stop: true
-        # port: ${{ secrets.PORT }}
+        envs: PROJ_DIR
         script: |
-          pwd
-          echo ${{ env.USER }}
+          cd /home/docker/proj/django-s3-stack
+          ls -a
