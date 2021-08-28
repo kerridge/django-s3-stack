@@ -20,3 +20,7 @@ firewall-cmd --list-all | grep http
 
 # Generate new SSH key pair
 # Update config with
+# mkdir -p /root/.ssh
+# chmod 700 /root/.ssh
+# echo ssh-rsa AA... youremail@example.com > /root/.ssh/authorized_keys
+# chmod 600 /root/.ssh/authorized_keys

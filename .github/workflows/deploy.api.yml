@@ -19,5 +19,8 @@ jobs:
         host: ${{ env.SERVER_IP }}
         username: ${{ env.USER }}
         key: ${{ secrets.WORK_MAC_SSH_PRIVATE }}
+        script_stop: true
         # port: ${{ secrets.PORT }}
-        script: pwd
+        script: |
+          pwd
+          echo ${{ env.USER }}
