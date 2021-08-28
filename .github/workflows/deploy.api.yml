@@ -1,0 +1,23 @@
+name: Deploy API to VPS
+
+on:
+  push:
+    branches: [ vultr ]
+
+env:
+  SERVER_IP: 149.28.180.213
+  USER: root
+
+jobs:
+  deploy:
+    name: Run deploy script via SSH
+    runs-on: ubuntu-latest
+    steps:
+    - name: executing remote ssh script using private key
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ env.SERVER_IP }}
+        username: ${{ env.USERNAME }}
+        key: ${{ secrets.WORK_MAC_SSH_PRIVATE }}
+        # port: ${{ secrets.PORT }}
+        script: pwd
