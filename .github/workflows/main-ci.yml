@@ -4,7 +4,7 @@ on:
   schedule:
     - cron: '34 0 * * *'
   push:
-    branches: [ main ]
+    branches: [ digitalocean ]
     # Publish semver tags as releases.
     tags: [ 'v*.*.*' ]
   pull_request:
