@@ -12,7 +12,7 @@ WORK_DIR=$ROOT_DIR/$GITHUB_REPOSITORY_NAME
 cd $WORK_DIR
 
 # If repository doesn't exist on server
-if [[ -d $GITHUB_REPOSITORY_NAME ]]; then
+if [[ ! -d $GITHUB_REPOSITORY_NAME ]]; then
     # Login to Github using github access token?
     git config --user.name=$GITHUB_USERNAME
 
