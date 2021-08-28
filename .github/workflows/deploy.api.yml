@@ -22,17 +22,7 @@ jobs:
         key: ${{ secrets.WORK_MAC_SSH_PRIVATE }}
         script_stop: true
         script: |
-          echo ${{ github.GITHUB_SERVER_URL }}/${{ github.GITHUB_REPOSITORY }}.git
           cd ${{ env.PROJ_DIR }}
-          ${{ env.DEPLOY_SCRIPT }}
-
-    - name: Check if modified files in project subdirectory
-      id: check_files
-      run: |
-        echo CUSTOM: ${{ github.server_url }}/${{ github.repository }}.git
-        echo OWNER: ${{ github.repository_owner }}
-        echo GIT URL: ${{ github.event.repository.git_url }}
-        echo SERVER: ${{ github.server_url }}
-        echo NAME: ${{ github.event.repository.name }}
+          ${{ env.DEPLOY_SCRIPT }} ${{ github.event.repository.git_url }} ${{ github.event.repository.name }} ${{ github.repository_owner }} ${{ secrets.GH_ACTIONS_READ_ONLY }}
         
           
