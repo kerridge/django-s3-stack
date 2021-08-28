@@ -17,7 +17,7 @@ jobs:
       uses: appleboy/ssh-action@master
       with:
         host: ${{ env.SERVER_IP }}
-        username: ${{ env.USERNAME }}
+        username: ${{ env.USER }}
         key: ${{ secrets.WORK_MAC_SSH_PRIVATE }}
         # port: ${{ secrets.PORT }}
         script: pwd
