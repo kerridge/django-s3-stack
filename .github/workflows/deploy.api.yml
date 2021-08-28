@@ -29,8 +29,10 @@ jobs:
     - name: Check if modified files in project subdirectory
       id: check_files
       run: |
-        echo ${{ github.server_url }}/${{ github.repository }}.git
-        echo ${{ github.repository_owner }}
-        echo ${{ github.repository.event.repository.name }}
+        echo CUSTOM: ${{ github.server_url }}/${{ github.repository }}.git
+        echo OWNER: ${{ github.repository_owner }}
+        echo GIT URL: ${{ github.event.repository.git_url }}
+        echo SERVER: ${{ github.server_url }}
+        echo NAME: ${{ github.event.repository.name }}
         
           
