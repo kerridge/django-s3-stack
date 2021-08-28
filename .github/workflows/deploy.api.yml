@@ -22,7 +22,7 @@ jobs:
         key: ${{ secrets.WORK_MAC_SSH_PRIVATE }}
         script_stop: true
         script: |
-          echo ${{ env.GITHUB_SERVER_URL }}/${{ env.GITHUB_REPOSITORY }}.git
+          echo ${{ github.GITHUB_SERVER_URL }}/${{ github.GITHUB_REPOSITORY }}.git
           cd ${{ env.PROJ_DIR }}
           ${{ env.DEPLOY_SCRIPT }}
           
