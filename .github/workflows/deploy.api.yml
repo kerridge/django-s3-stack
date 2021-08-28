@@ -14,13 +14,15 @@ jobs:
       env:
         SERVER_IP: 149.28.180.213
         USER: root
-        PROJ_DIR: "/home/docker/proj/django-s3-stack"
+        PROJ_DIR: /home/docker/proj/django-s3-stack
+        DEPLOY_SCRIPT: ./test.sh
       with:
         host: ${{ env.SERVER_IP }}
         username: ${{ env.USER }}
         key: ${{ secrets.WORK_MAC_SSH_PRIVATE }}
         script_stop: true
-        envs: PROJ_DIR
+        envs: PROJ_DIR, DEPLOY_SCRIPT
         script: |
-          cd /home/docker/proj/django-s3-stack
-          ./test.sh
+          cd $PROJ_DIR
+          $DEPLOY_SCRIPT
+          
