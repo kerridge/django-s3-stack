@@ -25,4 +25,8 @@ jobs:
           echo ${{ github.GITHUB_SERVER_URL }}/${{ github.GITHUB_REPOSITORY }}.git
           cd ${{ env.PROJ_DIR }}
           ${{ env.DEPLOY_SCRIPT }}
+
+    - name: Check if modified files in project subdirectory
+      id: check_files
+      run: echo ${{ github.GITHUB_SERVER_URL }}/${{ github.GITHUB_REPOSITORY }}.git
           
