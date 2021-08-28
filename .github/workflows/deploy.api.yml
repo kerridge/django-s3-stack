@@ -21,8 +21,7 @@ jobs:
         username: ${{ env.USER }}
         key: ${{ secrets.WORK_MAC_SSH_PRIVATE }}
         script_stop: true
-        envs: PROJ_DIR, DEPLOY_SCRIPT
         script: |
-          cd $PROJ_DIR
-          $DEPLOY_SCRIPT
+          cd ${{ env.PROJ_DIR }}
+          ${{ env.DEPLOY_SCRIPT }}
           
