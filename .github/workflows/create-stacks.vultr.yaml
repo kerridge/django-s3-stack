@@ -38,14 +38,14 @@ jobs:
       - name: Add SSH public key to Github Secrets
         uses: gliech/create-github-secret-action@v1
         with:
-          name: VULTR_SSH_PUBLIC_KEY
+          name: GH_SSH_PUBLIC_KEY
           value: ${{ env.PUBLIC_KEY }}
           pa_token: ${{ secrets.GH_PA_TOKEN }}
 
       - name: Add SSH private key to Github Secrets
         uses: gliech/create-github-secret-action@v1
         with:
-          name: VULTR_SSH_PRIVATE_KEY
+          name: GH_SSH_PRIVATE_KEY
           value: ${{ env.PRIVATE_KEY }}
           pa_token: ${{ secrets.GH_PA_TOKEN }}
 
@@ -59,25 +59,32 @@ jobs:
         with:
           token: ${{ secrets.VULTR_API_KEY }}
 
-      - name: Checkout test.sh startup script
+      - name: Checkout start-script.sh startup script
         uses: Bhacaz/checkout-files@v1
         with:
-          files: test.sh
+          files: start-script.sh
           token: ${{ secrets.GH_ACTIONS_READ_ONLY }}
 
       - name: Find and replace secrets in start script
         uses: jacobtomlinson/gha-find-replace@master
         with:
-          find: "<VULTR_API_KEY>"
-          replace: "${{ secrets.VULTR_API_KEY }}"
-          include: "test.sh"
+          find: "<GH_ACCESS_TOKEN>"
+          replace: "${{ secrets.GH_PA_TOKEN }}"
+          include: "start-script.sh"
 
       - name: Find and replace secrets in start script
         uses: jacobtomlinson/gha-find-replace@master
         with:
-          find: "<VULTR_SSH_PUBLIC_KEY>"
-          replace: "${{ secrets.VULTR_SSH_PUBLIC_KEY }}"
-          include: "test.sh"
+          find: "<GH_SSH_URL>"
+          replace: "${{ github.event.repository.ssh_url }}"
+          include: "start-script.sh"
+
+      - name: Find and replace secrets in start script
+        uses: jacobtomlinson/gha-find-replace@master
+        with:
+          find: "<GH_USERNAME>"
+          replace: "${{ github.repository_owner }}"
+          include: "start-script.sh"
 
       - name: Push startup script using vultr-cli
         id: push-startup-script
@@ -87,7 +94,7 @@ jobs:
           vultr-cli script list
 
           # base64 encode our script
-          SCRIPT=$(base64 -w0 test.sh)
+          SCRIPT=$(base64 -w0 start-script.sh)
 
           vultr-cli script create \
             --name ${{ env.VULTR_VPS_NAME }} \
