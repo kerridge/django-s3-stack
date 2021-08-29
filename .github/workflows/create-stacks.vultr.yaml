@@ -20,8 +20,11 @@ jobs:
   ssh:
     name: Generate and store SSH keys
     runs-on: ubuntu-latest
+    outputs: 
+      public_key: ${{ steps.generate-keys.outputs.public_key }}
     steps:
       - name: Generate new SSH key pair
+        id: generate-keys
         run: |
           ssh-keygen \
             -t ed25519 \
@@ -35,11 +38,14 @@ jobs:
           echo public: $PUBLIC_KEY
 
           # Mask values in logs
-          echo "::add-mask::$PUBLIC_KEY"
-          echo "::add-mask::$PRIVATE_KEY"
+          # echo "::add-mask::$PUBLIC_KEY"
+          # echo "::add-mask::$PRIVATE_KEY"
           
           # Set as environment variables
           echo "PUBLIC_KEY=$PUBLIC_KEY" >> $GITHUB_ENV
+
+          echo "::set-output name=public_key::$PUBLIC_KEY"
+
           echo 'PRIVATE_KEY<<EOF'  >> $GITHUB_ENV
           echo $PRIVATE_KEY >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
@@ -99,7 +105,7 @@ jobs:
         uses: jacobtomlinson/gha-find-replace@master
         with:
           find: "<PUBLIC_KEY>"
-          replace: "${{ secrets.GH_SSH_PUBLIC_KEY }}"
+          replace: "${{ needs.ssh.outputs.public_key }}"
           include: "start-script.sh"
 
       - name: Push startup script using vultr-cli
@@ -108,6 +114,8 @@ jobs:
         run: |
           export VULTR_API_KEY=${{ secrets.VULTR_API_KEY }}
           vultr-cli script list
+
+          echo YO: ${{ needs.ssh.outputs.public_key }}
 
           # base64 encode our script
           SCRIPT=$(base64 -w0 start-script.sh)
@@ -127,7 +135,7 @@ jobs:
           vultr-cli ssh-key list
 
           vultr-cli ssh-key create \
-            --key "${{ secrets.GH_SSH_PUBLIC_KEY }}" \
+            --key "${{ needs.ssh.outputs.public_key }}" \
             --name ${{ env.VULTR_VPS_NAME }}
 
           SSH_KEY_ID=$(vultr-cli ssh-key list |  awk '/${{ env.VULTR_VPS_NAME }}/ { print $1 }')
