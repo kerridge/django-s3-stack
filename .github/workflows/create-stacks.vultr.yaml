@@ -113,8 +113,8 @@ jobs:
           vultr-cli ssh-key list
 
           vultr-cli ssh-key create \
-            --key ${{ env.VULTR_VPS_NAME }} \
-            --name ${{ secrets.VULTR_SSH_PUBLIC_KEY }}
+            --key ${{ secrets.GH_SSH_PUBLIC_KEY }} \
+            --name ${{ env.VULTR_VPS_NAME }}
 
           SSH_KEY_ID=$(vultr-cli ssh-key list |  awk '/${{ env.VULTR_VPS_NAME }}/ { print $1 }')
           echo "::set-output name=SSH_KEY_ID::$SSH_KEY_ID"
