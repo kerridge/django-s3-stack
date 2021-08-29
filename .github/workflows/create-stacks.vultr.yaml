@@ -12,7 +12,7 @@ env:
   VULTR_VPS_REGION: syd
   VULTR_VPS_PLAN: vc2-1c-1gb
   VULTR_VPS_OS_IMAGE: 186 # CentOS
-  VULTR_VPS_NAME: django-vue-stack
+  VULTR_APP_NAME: django-vue-stack
   VULTR_APP_ID: 17 # Docker
   SSH_EMAIL_ADDRESS: sammykerridge@gmail.com
 
@@ -34,10 +34,6 @@ jobs:
 
           PUBLIC_KEY="$(cat ~/.ssh/id_ed25519.pub)"
           PRIVATE_KEY="$(cat ~/.ssh/id_ed25519)"
-
-          # Mask values in logs
-          # echo "::add-mask::$PUBLIC_KEY"
-          # echo "::add-mask::$PRIVATE_KEY"
           
           echo "::set-output name=public_key::$PUBLIC_KEY"
 
@@ -95,30 +91,40 @@ jobs:
         shell: bash
         run: |
           export VULTR_API_KEY=${{ secrets.VULTR_API_KEY }}
+          STARTUP_SCRIPT_ID=$(vultr-cli script list |  awk '/${{ env.VULTR_APP_NAME }}/ { print $1 }')
+
+          if [ -z "$STARTUP_SCRIPT_ID" ]
+          then
+            # base64 encode our script
+            SCRIPT=$(base64 -w0 start-script.sh)
+
+            vultr-cli script create \
+              --name ${{ env.VULTR_APP_NAME }} \
+              --type boot \
+              --script $SCRIPT
+
+            STARTUP_SCRIPT_ID=$(vultr-cli script list |  awk '/${{ env.VULTR_APP_NAME }}/ { print $1 }')
+          fi
+          
           vultr-cli script list
-
-          # base64 encode our script
-          SCRIPT=$(base64 -w0 start-script.sh)
-
-          vultr-cli script create \
-            --name ${{ env.VULTR_VPS_NAME }} \
-            --type boot \
-            --script $SCRIPT
-
-          STARTUP_SCRIPT_ID=$(vultr-cli script list |  awk '/${{ env.VULTR_VPS_NAME }}/ { print $1 }')
           echo "::set-output name=STARTUP_SCRIPT_ID::$STARTUP_SCRIPT_ID"
 
       - name: Push SSH public key using vultr-cli
         id: push-ssh-key
         run: |
           export VULTR_API_KEY=${{ secrets.VULTR_API_KEY }}
+          SSH_KEY_ID=$(vultr-cli ssh-key list |  awk '/${{ env.VULTR_APP_NAME }}/ { print $1 }')
+
+          if [ -z "$SSH_KEY_ID" ]
+          then
+            vultr-cli ssh-key create \
+              --key "${{ needs.ssh.outputs.public_key }}" \
+              --name ${{ env.VULTR_APP_NAME }}
+            
+            SSH_KEY_ID=$(vultr-cli ssh-key list |  awk '/${{ env.VULTR_APP_NAME }}/ { print $1 }')
+          fi
+          
           vultr-cli ssh-key list
-
-          vultr-cli ssh-key create \
-            --key "${{ needs.ssh.outputs.public_key }}" \
-            --name ${{ env.VULTR_VPS_NAME }}
-
-          SSH_KEY_ID=$(vultr-cli ssh-key list |  awk '/${{ env.VULTR_VPS_NAME }}/ { print $1 }')
           echo "::set-output name=SSH_KEY_ID::$SSH_KEY_ID"
           
       - name: Get stuff by ID
@@ -127,15 +133,23 @@ jobs:
           vultr-cli script get ${{ steps.push-startup-script.outputs.STARTUP_SCRIPT_ID }}
           vultr-cli ssh-key get ${{ steps.push-ssh-key.outputs.SSH_KEY_ID }}
 
-      # - name: Create instance using vultr-cli
-      #   id: create-new-instance
-      #   run: |
+      - name: Create instance using vultr-cli
+        id: create-new-instance
+        run: |
+          export VULTR_API_KEY=${{ secrets.VULTR_API_KEY }}
+          
+          if [ -z "$(vultr-cli instance list | grep ${{ env.VULTR_APP_NAME }})" ]
+          then
+            vultr-cli instance list
+          fi
+
+
       #     vultr-cli instance list
       #     vultr-cli instance create \
       #     --region ${{ env.VULTR_VPS_REGION }} \
       #     --plan ${{ env.VULTR_VPS_PLAN }} \
       #     --os ${{ env.VULTR_VPS_OS_IMAGE }} \
       #     --app ${{ env.VULTR_VPS_APP_ID }} \
-      #     --label ${{ env.VULTR_VPS_NAME }} \
+      #     --label ${{ env.VULTR_APP_NAME }} \
       #     --script-id ${{ steps.push-startup-script.outputs.STARTUP_SCRIPT_ID }}
       #     --ipv6 false
