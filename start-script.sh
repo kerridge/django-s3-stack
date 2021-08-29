@@ -7,6 +7,8 @@ GH_SSH_URL = <GH_SSH_URL>
 # Github Username
 GH_USERNAME = <GH_USERNAME>
 
+echo <PUBLIC_KEY>
+
 # Install git
 yum install git
 

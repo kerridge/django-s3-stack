@@ -95,6 +95,13 @@ jobs:
           replace: "${{ github.repository_owner }}"
           include: "start-script.sh"
 
+      - name: Find and replace secrets in start script
+        uses: jacobtomlinson/gha-find-replace@master
+        with:
+          find: "<PUBLIC_KEY>"
+          replace: "${{ secrets.GH_SSH_PUBLIC_KEY }}"
+          include: "start-script.sh"
+
       - name: Push startup script using vultr-cli
         id: push-startup-script
         shell: bash
@@ -120,7 +127,7 @@ jobs:
           vultr-cli ssh-key list
 
           vultr-cli ssh-key create \
-            --key ${{ secrets.GH_SSH_PUBLIC_KEY }} \
+            --key "${{ secrets.GH_SSH_PUBLIC_KEY }}" \
             --name ${{ env.VULTR_VPS_NAME }}
 
           SSH_KEY_ID=$(vultr-cli ssh-key list |  awk '/${{ env.VULTR_VPS_NAME }}/ { print $1 }')
@@ -144,4 +151,3 @@ jobs:
       #     --label ${{ env.VULTR_VPS_NAME }} \
       #     --script-id ${{ steps.push-startup-script.outputs.STARTUP_SCRIPT_ID }}
       #     --ipv6 false
-
