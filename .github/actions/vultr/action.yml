@@ -1,0 +1,36 @@
+name: Upload new Startup Script
+
+description: |
+  Desctiption of my action
+inputs:
+  foo:
+    description: thi is foo input
+    default: FOO
+    required: false
+runs:
+  using: "composite" # this is key point
+  steps:
+    - name: THIS IS STEP1
+      shell: bash
+      run: echo ${{ inputs.foo }}
+      
+    - name: Find and replace secrets in start script
+      uses: jacobtomlinson/gha-find-replace@master
+      with:
+        find: "<GH_ACCESS_TOKEN>"
+        replace: "${{ secrets.GH_PA_TOKEN }}"
+        include: "start-script.sh"
+
+    - name: Find and replace secrets in start script
+      uses: jacobtomlinson/gha-find-replace@master
+      with:
+        find: "<GH_SSH_URL>"
+        replace: "${{ github.event.repository.ssh_url }}"
+        include: "start-script.sh"
+
+    - name: Find and replace secrets in start script
+      uses: jacobtomlinson/gha-find-replace@master
+      with:
+        find: "<GH_USERNAME>"
+        replace: "${{ github.repository_owner }}"
+        include: "start-script.sh"
