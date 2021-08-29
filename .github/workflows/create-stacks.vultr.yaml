@@ -14,6 +14,7 @@ env:
   VULTR_VPS_OS_IMAGE: 186 # CentOS
   VULTR_VPS_NAME: django-vue-stack
   VULTR_APP_ID: 17 # Docker
+  SSH_EMAIL_ADDRESS: sammykerridge@gmail.com
 
 jobs:
   ssh:
@@ -22,10 +23,16 @@ jobs:
     steps:
       - name: Generate new SSH key pair
         run: |
-          ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -q -N ""
+          ssh-keygen \
+            -t ed25519 \
+            -f ~/.ssh/id_ed25519 \
+            -C "${{ env.SSH_EMAIL_ADDRESS }}" \
+            -q -N ""
 
           PUBLIC_KEY="$(cat ~/.ssh/id_ed25519.pub)"
           PRIVATE_KEY="$(cat ~/.ssh/id_ed25519)"
+
+          echo public: $PUBLIC_KEY
 
           # Mask values in logs
           echo "::add-mask::$PUBLIC_KEY"
