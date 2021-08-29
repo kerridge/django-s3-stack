@@ -34,7 +34,7 @@ ssh-keygen -t ed25519 -C "example@mail.com" -q -N ""
 HOST_PUBLIC_KEY=`cat ~/.ssh/id_ed25519.pub`
 # Upload public key to Github
 curl \
-    -H "Authorization: token YOUR_TOKEN_HERE" \
+    -H "Authorization: token $GITHUB_ACCESS_TOKEN" \
     --data '{"title":"Vultr VPS","key":"'"$HOST_PUBLIC_KEY"'"}' \
     https://api.github.com/user/keys
 
