@@ -1,4 +1,4 @@
-# !/bin/sh
+#!/bin/sh
 
 # Github access token with read/write access to ssh keys
 GH_SSH_ACCESS_TOKEN = <GH_ACCESS_TOKEN>

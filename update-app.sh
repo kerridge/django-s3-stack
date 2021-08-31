@@ -25,6 +25,8 @@ fi
 
 cd $GITHUB_REPOSITORY_NAME
 
+# docker login
+
 # Pull latest repo changes in case our scripts updated
 git pull origin vultr
 

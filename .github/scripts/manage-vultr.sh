@@ -4,10 +4,12 @@
 # VULTR_API_KEY
 
 function createSshKey() {
-    SSH_KEY_ID=$(vultr-cli ssh-key list |  awk "/$VULTR_APP_NAME/ { print $1 }")
+    SSH_KEY_ID=$(vultr-cli ssh-key list  | eval "awk '/$VULTR_APP_NAME/ {print \$1}'")
 
     if [ -z "$SSH_KEY_ID" ]
     then
+        echo "No SSH key found, creating one now..."
+
         ssh-keygen \
             -t ed25519 \
             -f ~/.ssh/id_ed25519 \
@@ -17,17 +19,14 @@ function createSshKey() {
         PUBLIC_KEY="$(cat ~/.ssh/id_ed25519.pub)"
         PRIVATE_KEY="$(cat ~/.ssh/id_ed25519)"
 
-        # Set as environment variables
-        echo 'PRIVATE_KEY<<EOF'  >> $GITHUB_ENV
-        echo $PRIVATE_KEY >> $GITHUB_ENV
-        echo 'EOF' >> $GITHUB_ENV
-
+        # Write key to file for future steps to use
+        echo $PRIVATE_KEY >> key.txt
 
         vultr-cli ssh-key create \
             --key "$PUBLIC_KEY" \
             --name "$VULTR_APP_NAME"
         
-        SSH_KEY_ID=$(vultr-cli ssh-key list |  awk "/$VULTR_APP_NAME/ { print $1 }")
+        SSH_KEY_ID=$(vultr-cli ssh-key list  | eval "awk '/$VULTR_APP_NAME/ {print \$1}'")
         
         echo "SSH_KEY_ID=$SSH_KEY_ID"  >> $GITHUB_ENV
         
@@ -38,10 +37,12 @@ function createSshKey() {
 }
 
 function createStartupScript() {
-    STARTUP_SCRIPT_ID=$(vultr-cli script list |  awk "/$VULTR_APP_NAME/ { print $1 }")
+    STARTUP_SCRIPT_ID=$(vultr-cli script list  | eval "awk '/$VULTR_APP_NAME/ {print \$1}'")
 
     if [ -z "$STARTUP_SCRIPT_ID" ]
     then
+        echo "No startup script found, creating one now..."
+
         # base64 encode our script
         SCRIPT=$(base64 -w0 start-script.sh)
 
@@ -50,12 +51,13 @@ function createStartupScript() {
             --type boot \
             --script $SCRIPT
 
-        STARTUP_SCRIPT_ID=$(vultr-cli script list |  awk "/$VULTR_APP_NAME/ { print $1 }")
+        STARTUP_SCRIPT_ID=$(vultr-cli script list  | eval "awk '/$VULTR_APP_NAME/ {print \$1}'")
         
         echo "STARTUP_SCRIPT_ID=$STARTUP_SCRIPT_ID"  >> $GITHUB_ENV
 
         vultr-cli script list
     else
+        echo Found existing configuration, exiting now...
         exit 1
     fi
 }
@@ -74,6 +76,7 @@ function getInstanceIpAddress() {
 while [ $# -gt 0 ]; do
     case $1 in
         "--ssh") createSshKey; shift; ;;
+        "--start-script") createStartupScript; shift; ;;
         *) shift ;;
     esac
 done

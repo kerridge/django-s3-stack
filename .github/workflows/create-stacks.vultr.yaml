@@ -19,53 +19,51 @@ env:
   SSH_EMAIL_ADDRESS: sammykerridge@gmail.com
 
 jobs:
-  ssh:
-    name: Generate and store SSH keys
+  prepare:
+    name: Prepare SSH keys and startup script
+    outputs:
+      STARTUP_SCRIPT_ID: ${{ steps.set-ids.outputs.STARTUP_SCRIPT_ID }}
+      SSH_KEY_ID: ${{ steps.set-ids.outputs.SSH_KEY_ID }}
     runs-on: ubuntu-latest
     steps:
+      # ============== PREPARE =====================
       - name: Install vultr-cli
         uses: techknowlogick/action-vultr@v2
         with:
           token: ${{ secrets.VULTR_API_KEY }}
-          
-      - name: Checkout start-script.sh startup script
+      
+      - name: Checkout server startup script and github scripts
         uses: Bhacaz/checkout-files@v1
         with:
-          files: ".github/scripts"
+          files: ".github/scripts start-script.sh"
           token: ${{ secrets.GH_ACTIONS_READ_ONLY }}
-
-      - name: Generate + upload new SSH key pair
+      
+      # ============== SSH KEYS =====================
+      - name: Generate + upload new SSH keys
         id: generate-keys
-        run: bash -eux .github/scripts/manage-vultr.sh --ssh
+        run: bash -eu .github/scripts/manage-vultr.sh --ssh
         env:
           VULTR_API_KEY: ${{ secrets.VULTR_API_KEY }}
+
+      - name: Read in and mask private key
+        id: private-key
+        run: |
+          PRIVATE_KEY=$(cat key.txt)
+          echo "::set-output name=PRIVATE_KEY::$PRIVATE_KEY"
+          
+          cat key.txt | while read line
+          do
+            echo "::add-mask::$line"
+          done
 
       - name: Add SSH private key to Github Secrets
         uses: gliech/create-github-secret-action@v1
         with:
           name: GH_SSH_PRIVATE_KEY
-          value: ${{ env.PRIVATE_KEY }}
+          value: ${{ steps.private-key.outputs.PRIVATE_KEY }}
           pa_token: ${{ secrets.GH_PA_TOKEN }}
 
-  vultr:
-    name: Deploy Vultr VPS Instance
-    needs: ssh
-    runs-on: ubuntu-latest
-    steps:
-      - name: Install vultr-cli
-        uses: techknowlogick/action-vultr@v2
-        with:
-          token: ${{ secrets.VULTR_API_KEY }}
-
-      - name: Checkout start-script.sh startup script
-        uses: Bhacaz/checkout-files@v1
-        with:
-          files: "start-script.sh .github"
-          token: ${{ secrets.GH_ACTIONS_READ_ONLY }}
-
-      # - name: Find and replace secrets
-      #   uses: ./.github/actions/vultr
-
+      # ============== START SCRIPT =====================
       - name: Find and replace secrets in start script
         uses: jacobtomlinson/gha-find-replace@master
         with:
@@ -87,59 +85,40 @@ jobs:
           replace: "${{ github.repository_owner }}"
           include: "start-script.sh"
 
-      - name: Push startup script using vultr-cli
-        id: push-startup-script
-        shell: bash
+      - name: Encode and upload start script to Vultr
+        run: bash -eu .github/scripts/manage-vultr.sh --start-script
+        env:
+          VULTR_API_KEY: ${{ secrets.VULTR_API_KEY }}
+
+      - name: Set outputs for next job to use
+        id: set-ids
         run: |
-          export VULTR_API_KEY=${{ secrets.VULTR_API_KEY }}
-          STARTUP_SCRIPT_ID=$(vultr-cli script list |  awk '/${{ env.VULTR_APP_NAME }}/ { print $1 }')
+          echo "::set-output name=STARTUP_SCRIPT_ID::${{ env.STARTUP_SCRIPT_ID }}"
+          echo "::set-output name=SSH_KEY_ID::${{ env.SSH_KEY_ID }}"
 
-          if [ -z "$STARTUP_SCRIPT_ID" ]
-          then
-            # base64 encode our script
-            SCRIPT=$(base64 -w0 start-script.sh)
-
-            vultr-cli script create \
-              --name ${{ env.VULTR_APP_NAME }} \
-              --type boot \
-              --script $SCRIPT
-
-            STARTUP_SCRIPT_ID=$(vultr-cli script list |  awk '/${{ env.VULTR_APP_NAME }}/ { print $1 }')
-          fi
-          
-          vultr-cli script list
-          echo "::set-output name=STARTUP_SCRIPT_ID::$STARTUP_SCRIPT_ID"
-
-      # - name: Push SSH public key using vultr-cli
-      #   id: push-ssh-key
-      #   run: |
-      #     export VULTR_API_KEY=${{ secrets.VULTR_API_KEY }}
-      #     SSH_KEY_ID=$(vultr-cli ssh-key list |  awk '/${{ env.VULTR_APP_NAME }}/ { print $1 }')
-
-      #     if [ -z "$SSH_KEY_ID" ]
-      #     then
-      #       vultr-cli ssh-key create \
-      #         --key "${{ needs.ssh.outputs.public_key }}" \
-      #         --name ${{ env.VULTR_APP_NAME }}
-            
-      #       SSH_KEY_ID=$(vultr-cli ssh-key list |  awk '/${{ env.VULTR_APP_NAME }}/ { print $1 }')
-      #     fi
-          
-      #     vultr-cli ssh-key list
-      #     echo "::set-output name=SSH_KEY_ID::$SSH_KEY_ID"
-          
+  deploy:
+    name: Deploy Vultr VPS Instance
+    needs: prepare
+    runs-on: ubuntu-latest
+    steps:
+      # ============== PREPARE =====================
+      - name: Install vultr-cli
+        uses: techknowlogick/action-vultr@v2
+        with:
+          token: ${{ secrets.VULTR_API_KEY }}
+      
+      - name: Checkout github scripts
+        uses: Bhacaz/checkout-files@v1
+        with:
+          files: ".github/scripts"
+          token: ${{ secrets.GH_ACTIONS_READ_ONLY }}
+      
+      # ============== DEPLOY =====================
       - name: Get stuff by ID
         run: |
           export VULTR_API_KEY=${{ secrets.VULTR_API_KEY }}
-          vultr-cli script get ${{ steps.push-startup-script.outputs.STARTUP_SCRIPT_ID }}
-          # vultr-cli ssh-key get ${{ steps.push-ssh-key.outputs.SSH_KEY_ID }}
-
-      # - run: echo "envvv ${{ env.GIT_TAG_SCRIPT }}"
-      # - run: bash -eux .github/scripts/manage-vultr.sh --ref "bitch"
-      #   env:
-      #     VULTR_API_KEY: ${{ secrets.VULTR_API_KEY }}
-      
-      # - run: echo ${{ steps.push-ssh-key.outputs.WORD }}
+          vultr-cli script get ${{needs.prepare.outputs.STARTUP_SCRIPT_ID}}
+          vultr-cli ssh-key get ${{needs.prepare.outputs.SSH_KEY_ID}}
           
       - name: Create instance using vultr-cli
         id: create-new-instance
