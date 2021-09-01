@@ -3,8 +3,15 @@
 # ENV
 # VULTR_API_KEY
 
+# Returns a UUID for the Vultr resource requested
+# $1: The type of resource (e.g. 'instance')
+function getResourceID() {
+    vultr-cli $1 list | eval "awk '/$VULTR_APP_NAME/ {print \$1}'"
+}
+
+
 function createSshKey() {
-    SSH_KEY_ID=$(vultr-cli ssh-key list  | eval "awk '/$VULTR_APP_NAME/ {print \$1}'")
+    SSH_KEY_ID=$(getResourceID "ssh-key")
 
     if [ -z "$SSH_KEY_ID" ]
     then
@@ -26,7 +33,7 @@ function createSshKey() {
             --key "$PUBLIC_KEY" \
             --name "$VULTR_APP_NAME"
         
-        SSH_KEY_ID=$(vultr-cli ssh-key list  | eval "awk '/$VULTR_APP_NAME/ {print \$1}'")
+        SSH_KEY_ID=$(getResourceID "ssh-key")
             
         vultr-cli ssh-key list
     else
@@ -37,7 +44,7 @@ function createSshKey() {
 }
 
 function createStartupScript() {
-    STARTUP_SCRIPT_ID=$(vultr-cli script list  | eval "awk '/$VULTR_APP_NAME/ {print \$1}'")
+    STARTUP_SCRIPT_ID=$(getResourceID "script")
 
     if [ -z "$STARTUP_SCRIPT_ID" ]
     then
@@ -51,7 +58,7 @@ function createStartupScript() {
             --type boot \
             --script $SCRIPT
 
-        STARTUP_SCRIPT_ID=$(vultr-cli script list  | eval "awk '/$VULTR_APP_NAME/ {print \$1}'")
+        STARTUP_SCRIPT_ID=$(getResourceID "script")
     else
         echo Found existing configuration, skipping create...
     fi
@@ -74,23 +81,34 @@ function createInstance() {
             --ipv6 false
 
         # vultr-cli instance list
-        INSTANCE_ID=$(vultr-cli instance list  | eval "awk '/$VULTR_APP_NAME/ {print \$1}'")
+        INSTANCE_ID=$(getResourceID "instance")
         vultr-cli instance get $INSTANCE_ID
     else
-        echo "Found existing instance with matching name, cancelling deployment..."
+        echo "Found existing instance with matching name, aborting deployment..."
         exit 1
     fi
 }
 
 function getInstanceIpAddress() {
-    echo yo
+    # Wait for instance to leave pending state
+    while [ $(vultr-cli instance list | eval "awk '/$VULTR_APP_NAME/ {print \$5}'") == "pending" ];
+    do
+        sleep 1
+    done
+
+    # Grab and output instance IP address
+    VULTR_VPS_INSTANCE_IP=$(vultr-cli instance list | eval "awk '/django/ {print \$2}'")
+    echo $VULTR_VPS_INSTANCE_IP
+    echo "VULTR_VPS_INSTANCE_IP=$VULTR_VPS_INSTANCE_IP"  >> $GITHUB_ENV
 }
+
 
 while [ $# -gt 0 ]; do
     case $1 in
         "--ssh") createSshKey; shift; ;;
         "--start-script") createStartupScript; shift; ;;
         "--create-instance") createInstance; shift; ;;
+        "--get-ip") getInstanceIpAddress; shift; ;;
         *) shift ;;
     esac
 done

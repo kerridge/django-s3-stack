@@ -1,16 +1,9 @@
 #!/bin/bash
 
-function createSshKey() {
-    # SSH_KEY_ID=$(vultr-cli ssh-key list |  awk -v h="/django/" '$0 ~ h{ print $1 }')
-    SSH_KEY_ID=$(vultr-cli ssh-key list | eval "awk '/django/ {print \$1}'")
-    
-    echo $SSH_KEY_ID
+# Returns a UUID for the Vultr resource requested
+# $1: The type of resource (e.g. 'instance')
+function getResourceID() {
+    vultr-cli $1 list | eval "awk '/django/ {print \$1}'"
 }
 
-function getID() {
-    $1 | eval "awk '/django/ {print \$1}'"
-}
-
-# createSshKey
-
-echo `getID $(vultr-cli ssh-key list)`
+ID=$(getResourceID "instance")

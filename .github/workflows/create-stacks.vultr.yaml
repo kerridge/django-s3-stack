@@ -1,8 +1,6 @@
 name: Create VPS instance using VultrCLI
 
-on: 
-  push:
-    branches: [ main ]
+on:
   workflow_dispatch:
     inputs:
       logLevel:
@@ -50,14 +48,14 @@ jobs:
         if: hashFiles('key.txt') != ''
         run: |
           PRIVATE_KEY=$(cat key.txt)
-          echo "::set-output name=PRIVATE_KEY::$PRIVATE_KEY"
           
           cat key.txt | while read line
           do
             echo "::add-mask::$line"
           done
 
-        # TODO: add if check for SSH
+          echo "::set-output name=PRIVATE_KEY::$PRIVATE_KEY"
+
       - name: Add SSH private key to Github Secrets
         if: hashFiles('key.txt') != ''
         uses: gliech/create-github-secret-action@v1
@@ -124,15 +122,21 @@ jobs:
           token: ${{ secrets.GH_ACTIONS_READ_ONLY }}
       
       # ============== DEPLOY =====================
-      # - name: Get stuff by ID
-      #   run: |
-      #     export VULTR_API_KEY=${{ secrets.VULTR_API_KEY }}
-      #     vultr-cli script get ${{needs.prepare.outputs.STARTUP_SCRIPT_ID}}
-      #     vultr-cli ssh-key get ${{needs.prepare.outputs.SSH_KEY_ID}}
-          
       - name: Create instance using vultr-cli
         run: bash -eux .github/scripts/manage-vultr.sh --create-instance
         env:
           VULTR_API_KEY: ${{ secrets.VULTR_API_KEY }}
           STARTUP_SCRIPT_ID: ${{ needs.prepare.outputs.STARTUP_SCRIPT_ID }}
           SSH_KEY_ID: ${{ needs.prepare.outputs.SSH_KEY_ID }}
+
+      - name: Wait for instance start then get IP
+        run: bash -eux .github/scripts/manage-vultr.sh --get-ip
+        env:
+          VULTR_API_KEY: ${{ secrets.VULTR_API_KEY }}
+
+      - name: Add instance IP address to Github Secrets
+        uses: gliech/create-github-secret-action@v1
+        with:
+          name: VULTR_VPS_INSTANCE_IP
+          value: ${{ env.VULTR_VPS_INSTANCE_IP }}
+          pa_token: ${{ secrets.GH_PA_TOKEN }}
