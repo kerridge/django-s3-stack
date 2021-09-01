@@ -10,17 +10,25 @@ jobs:
     name: Run deploy script via SSH
     runs-on: ubuntu-latest
     steps:
-    - name: executing remote ssh script using private key
-      uses: appleboy/ssh-action@master
-      env:
-        USER: root
-        PROJ_DIR: /home/docker/django-s3-stack
-        DEPLOY_SCRIPT: ./test.sh
+    - name: USE MY THING
+      uses: kerridge/actions-secret-manager@main
       with:
-        host: ${{ secrets.VULTR_VPS_INSTANCE_IP }}
-        username: ${{ env.USER }}
-        key: ${{ secrets.GH_SSH_PRIVATE_KEY }}
-        script_stop: true
-        script: |
-          cd ${{ env.PROJ_DIR }}
-          ${{ env.DEPLOY_SCRIPT }} ${{ github.event.repository.git_url }} ${{ github.event.repository.name }} ${{ github.repository_owner }} ${{ secrets.GH_ACTIONS_READ_ONLY }}
+        action: create
+        token: ${{ secrets.GH_PA_TOKEN }}
+        name: YES_BITCH
+        value: "CALCIUM"
+        
+    # - name: executing remote ssh script using private key
+    #   uses: appleboy/ssh-action@master
+    #   env:
+    #     USER: root
+    #     PROJ_DIR: /home/docker/django-s3-stack
+    #     DEPLOY_SCRIPT: ./test.sh
+    #   with:
+    #     host: ${{ secrets.VULTR_VPS_INSTANCE_IP }}
+    #     username: ${{ env.USER }}
+    #     key: ${{ secrets.GH_SSH_PRIVATE_KEY }}
+    #     script_stop: true
+    #     script: |
+    #       cd ${{ env.PROJ_DIR }}
+    #       ${{ env.DEPLOY_SCRIPT }} ${{ github.event.repository.git_url }} ${{ github.event.repository.name }} ${{ github.repository_owner }} ${{ secrets.GH_ACTIONS_READ_ONLY }}
