@@ -88,6 +88,13 @@ jobs:
           replace: "${{ github.repository_owner }}"
           include: "start-script.sh"
 
+      - name: Find and replace secrets in start script
+        uses: jacobtomlinson/gha-find-replace@master
+        with:
+          find: "<VULTR_APP_NAME>"
+          replace: "${{ env.VULTR_APP_NAME }}"
+          include: "start-script.sh"
+
       - name: Encode and upload start script to Vultr
         run: bash -eu .github/scripts/manage-vultr.sh --start-script
         env:

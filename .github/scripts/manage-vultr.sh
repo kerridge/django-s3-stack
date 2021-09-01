@@ -31,7 +31,6 @@ function createSshKey() {
         vultr-cli ssh-key list
     else
         echo Found existing configuration, skipping create...
-        # exit 1
     fi
 
     echo "SSH_KEY_ID=$SSH_KEY_ID"  >> $GITHUB_ENV
@@ -53,12 +52,8 @@ function createStartupScript() {
             --script $SCRIPT
 
         STARTUP_SCRIPT_ID=$(vultr-cli script list  | eval "awk '/$VULTR_APP_NAME/ {print \$1}'")
-        
-
-        vultr-cli script list
     else
         echo Found existing configuration, skipping create...
-        # exit 1
     fi
 
     echo "STARTUP_SCRIPT_ID=$STARTUP_SCRIPT_ID"  >> $GITHUB_ENV

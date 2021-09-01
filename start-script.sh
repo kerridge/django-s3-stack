@@ -6,6 +6,8 @@ GH_SSH_ACCESS_TOKEN=<GH_ACCESS_TOKEN>
 GH_SSH_URL=<GH_SSH_URL>
 # Github Username
 GH_USERNAME=<GH_USERNAME>
+# Name of the application on Vultr
+VULTR_APP_NAME=<VULTR_APP_NAME>
 
 # Install git
 yum -y install git
@@ -47,7 +49,7 @@ VPS_PUBLIC_KEY=`cat ~/.ssh/id_ed25519.pub`
 # Upload public key to Github
 curl \
     -H "Authorization: token $GH_SSH_ACCESS_TOKEN" \
-    --data '{"title":"Vultr VPS","key":"'"$VPS_PUBLIC_KEY"'"}' \
+    --data '{"title":"'"Vultr VPS $VULTR_APP_NAME"'","key":"'"$VPS_PUBLIC_KEY"'"}' \
     https://api.github.com/user/keys
 
 
@@ -65,5 +67,10 @@ ROOT_DIR="/home/docker/"
 
 # Change working directory
 cd $ROOT_DIR
+
+if [ ! -n "$(grep "^github.com " ~/.ssh/known_hosts)" ];
+then 
+    ssh-keyscan github.com >> ~/.ssh/known_hosts 2>/dev/null; 
+fi;
 
 git clone $GH_SSH_URL
