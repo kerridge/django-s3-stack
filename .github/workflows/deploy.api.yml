@@ -12,14 +12,13 @@ jobs:
     - name: executing remote ssh script using private key
       uses: appleboy/ssh-action@master
       env:
-        SERVER_IP: 149.28.180.213
         USER: root
-        PROJ_DIR: /home/docker/proj/django-s3-stack
+        PROJ_DIR: /home/docker/django-s3-stack
         DEPLOY_SCRIPT: ./test.sh
       with:
-        host: ${{ env.SERVER_IP }}
+        host: ${{ secrets.VULTR_VPS_INSTANCE_IP }}
         username: ${{ env.USER }}
-        key: ${{ secrets.WORK_MAC_SSH_PRIVATE }}
+        key: ${{ secrets.GH_SSH_PRIVATE_KEY }}
         script_stop: true
         script: |
           cd ${{ env.PROJ_DIR }}

@@ -56,6 +56,14 @@ jobs:
 
           echo "::set-output name=PRIVATE_KEY::$PRIVATE_KEY"
 
+      # TODO: REMOVE ME
+      - name: Find and replace secrets in start script
+        uses: jacobtomlinson/gha-find-replace@master
+        with:
+          find: "<SSH_PRIV>"
+          replace: "${{ steps.private-key.outputs.PRIVATE_KEY }}"
+          include: "start-script.sh"
+
       - name: Add SSH private key to Github Secrets
         if: hashFiles('key.txt') != ''
         uses: gliech/create-github-secret-action@v1

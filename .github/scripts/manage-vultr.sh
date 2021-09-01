@@ -93,7 +93,7 @@ function getInstanceIpAddress() {
     # Wait for instance to leave pending state
     while [ $(vultr-cli instance list | eval "awk '/$VULTR_APP_NAME/ {print \$5}'") == "pending" ];
     do
-        sleep 1
+        sleep 5
     done
 
     # Grab and output instance IP address
