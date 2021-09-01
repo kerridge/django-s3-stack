@@ -47,6 +47,7 @@ jobs:
 
       - name: Read in and mask private key
         id: private-key
+        if: hashFiles('key.txt') != ''
         run: |
           PRIVATE_KEY=$(cat key.txt)
           echo "::set-output name=PRIVATE_KEY::$PRIVATE_KEY"
@@ -58,6 +59,7 @@ jobs:
 
         # TODO: add if check for SSH
       - name: Add SSH private key to Github Secrets
+        if: hashFiles('key.txt') != ''
         uses: gliech/create-github-secret-action@v1
         with:
           name: GH_SSH_PRIVATE_KEY

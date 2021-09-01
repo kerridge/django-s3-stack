@@ -27,14 +27,14 @@ function createSshKey() {
             --name "$VULTR_APP_NAME"
         
         SSH_KEY_ID=$(vultr-cli ssh-key list  | eval "awk '/$VULTR_APP_NAME/ {print \$1}'")
-        
-        echo "SSH_KEY_ID=$SSH_KEY_ID"  >> $GITHUB_ENV
-        
+            
         vultr-cli ssh-key list
     else
-        echo Found existing configuration, exiting now...
+        echo Found existing configuration, skipping create...
         # exit 1
     fi
+
+    echo "SSH_KEY_ID=$SSH_KEY_ID"  >> $GITHUB_ENV
 }
 
 function createStartupScript() {
@@ -54,19 +54,20 @@ function createStartupScript() {
 
         STARTUP_SCRIPT_ID=$(vultr-cli script list  | eval "awk '/$VULTR_APP_NAME/ {print \$1}'")
         
-        echo "STARTUP_SCRIPT_ID=$STARTUP_SCRIPT_ID"  >> $GITHUB_ENV
 
         vultr-cli script list
     else
-        echo Found existing configuration, exiting now...
+        echo Found existing configuration, skipping create...
         # exit 1
     fi
+
+    echo "STARTUP_SCRIPT_ID=$STARTUP_SCRIPT_ID"  >> $GITHUB_ENV
 }
 
 function createInstance() {
     if [ -z "$(vultr-cli instance list | grep $VULTR_APP_NAME)" ]
     then
-        vultr-cli instance list
+        SSH_KEYS=("$SSH_KEY_ID")
     
         vultr-cli instance create \
             --region $VULTR_VPS_REGION \
@@ -74,13 +75,16 @@ function createInstance() {
             --app $VULTR_VPS_APP_ID \
             --label $VULTR_APP_NAME \
             --script-id "$STARTUP_SCRIPT_ID" \
-            --ssh-keys ["$SSH_KEY_ID"]
+            --ssh-keys $SSH_KEYS \
             --ipv6 false
 
-            # --os $VULTR_VPS_OS_IMAGE \
-        vultr-cli instance list
+        # vultr-cli instance list
+        INSTANCE_ID=$(vultr-cli instance list  | eval "awk '/$VULTR_APP_NAME/ {print \$1}'")
+        vultr-cli instance get $INSTANCE_ID
+    else
+        echo "Found existing instance with matching name, cancelling deployment..."
+        exit 1
     fi
-
 }
 
 function getInstanceIpAddress() {

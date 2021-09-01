@@ -8,7 +8,7 @@ GH_SSH_URL = <GH_SSH_URL>
 GH_USERNAME = <GH_USERNAME>
 
 # Install git
-yum install git
+yum -y install git
 
 # Add http as a service to open port 80
 firewall-cmd --add-service=http --permanent
