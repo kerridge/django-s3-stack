@@ -1,11 +1,11 @@
-#!/bin/sh
+#!/bin/bash
 
 # Github access token with read/write access to ssh keys
-GH_SSH_ACCESS_TOKEN = <GH_ACCESS_TOKEN>
+GH_SSH_ACCESS_TOKEN=<GH_ACCESS_TOKEN>
 # SSH URL from the repository to clone
-GH_SSH_URL = <GH_SSH_URL>
+GH_SSH_URL=<GH_SSH_URL>
 # Github Username
-GH_USERNAME = <GH_USERNAME>
+GH_USERNAME=<GH_USERNAME>
 
 # Install git
 yum -y install git
@@ -35,18 +35,22 @@ firewall-cmd --list-all | grep http
 # chmod 600 /root/.ssh/authorized_keys
 
 # Generate new SSH key pair for using Git
-ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -q -N ""
+ssh-keygen \
+    -t ed25519 \
+    -f ~/.ssh/id_ed25519 \
+    -C "sammykerridge@gmail.com" \
+    -q -N ""
+
 
 # Copy public key
 VPS_PUBLIC_KEY=`cat ~/.ssh/id_ed25519.pub`
 # Upload public key to Github
 curl \
-    -H "Authorization: token $GH_ACCESS_TOKEN" \
+    -H "Authorization: token $GH_SSH_ACCESS_TOKEN" \
     --data '{"title":"Vultr VPS","key":"'"$VPS_PUBLIC_KEY"'"}' \
     https://api.github.com/user/keys
 
 
-GITHUB_USERNAME=""
 # Write host to config file
 echo """
 Host github.com-$GH_USERNAME
