@@ -32,7 +32,8 @@ function createSshKey() {
         
         vultr-cli ssh-key list
     else
-        exit 1
+        echo Found existing configuration, exiting now...
+        # exit 1
     fi
 }
 
@@ -58,7 +59,7 @@ function createStartupScript() {
         vultr-cli script list
     else
         echo Found existing configuration, exiting now...
-        exit 1
+        # exit 1
     fi
 }
 
@@ -66,7 +67,20 @@ function createInstance() {
     if [ -z "$(vultr-cli instance list | grep $VULTR_APP_NAME)" ]
     then
         vultr-cli instance list
+    
+        vultr-cli instance create \
+            --region $VULTR_VPS_REGION \
+            --plan $VULTR_VPS_PLAN \
+            --os $VULTR_VPS_OS_IMAGE \
+            --app $VULTR_VPS_APP_ID \
+            --label $VULTR_APP_NAME \
+            --script-id $STARTUP_SCRIPT_ID \
+            --ssh-keys ["$SSH_KEY_ID"]
+            --ipv6 false
+
+        vultr-cli instance list
     fi
+
 }
 
 function getInstanceIpAddress() {
@@ -77,6 +91,7 @@ while [ $# -gt 0 ]; do
     case $1 in
         "--ssh") createSshKey; shift; ;;
         "--start-script") createStartupScript; shift; ;;
+        "--create-instance") createInstance; shift; ;;
         *) shift ;;
     esac
 done

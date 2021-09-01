@@ -14,8 +14,8 @@ env:
   VULTR_VPS_REGION: syd
   VULTR_VPS_PLAN: vc2-1c-1gb
   VULTR_VPS_OS_IMAGE: 186 # CentOS
+  VULTR_VPS_APP_ID: 17 # Docker
   VULTR_APP_NAME: django-vue-stack
-  VULTR_APP_ID: 17 # Docker
   SSH_EMAIL_ADDRESS: sammykerridge@gmail.com
 
 jobs:
@@ -114,27 +114,15 @@ jobs:
           token: ${{ secrets.GH_ACTIONS_READ_ONLY }}
       
       # ============== DEPLOY =====================
-      - name: Get stuff by ID
-        run: |
-          export VULTR_API_KEY=${{ secrets.VULTR_API_KEY }}
-          vultr-cli script get ${{needs.prepare.outputs.STARTUP_SCRIPT_ID}}
-          vultr-cli ssh-key get ${{needs.prepare.outputs.SSH_KEY_ID}}
+      # - name: Get stuff by ID
+      #   run: |
+      #     export VULTR_API_KEY=${{ secrets.VULTR_API_KEY }}
+      #     vultr-cli script get ${{needs.prepare.outputs.STARTUP_SCRIPT_ID}}
+      #     vultr-cli ssh-key get ${{needs.prepare.outputs.SSH_KEY_ID}}
           
       - name: Create instance using vultr-cli
-        id: create-new-instance
-        run: |
-          export VULTR_API_KEY=${{ secrets.VULTR_API_KEY }}
-
-          if [ -z "$(vultr-cli instance list | grep ${{ env.VULTR_APP_NAME }})" ]
-          then
-            vultr-cli instance list
-          fi
-
-      #     vultr-cli instance create \
-      #     --region ${{ env.VULTR_VPS_REGION }} \
-      #     --plan ${{ env.VULTR_VPS_PLAN }} \
-      #     --os ${{ env.VULTR_VPS_OS_IMAGE }} \
-      #     --app ${{ env.VULTR_VPS_APP_ID }} \
-      #     --label ${{ env.VULTR_APP_NAME }} \
-      #     --script-id ${{ steps.push-startup-script.outputs.STARTUP_SCRIPT_ID }}
-      #     --ipv6 false
+        run: bash -eu .github/scripts/manage-vultr.sh --create-instance
+        env:
+          VULTR_API_KEY: ${{ secrets.VULTR_API_KEY }}
+          STARTUP_SCRIPT_ID: ${{ needs.prepare.outputs.STARTUP_SCRIPT_ID }}
+          SSH_KEY_ID: ${{ needs.prepare.outputs.SSH_KEY_ID }}
