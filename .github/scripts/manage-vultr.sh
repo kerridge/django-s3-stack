@@ -73,7 +73,7 @@ function createInstance() {
             --plan $VULTR_VPS_PLAN \
             --app $VULTR_VPS_APP_ID \
             --label $VULTR_APP_NAME \
-            --script-id $STARTUP_SCRIPT_ID \
+            --script-id "$STARTUP_SCRIPT_ID" \
             --ssh-keys ["$SSH_KEY_ID"]
             --ipv6 false
 

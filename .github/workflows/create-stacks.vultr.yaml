@@ -122,7 +122,7 @@ jobs:
       #     vultr-cli ssh-key get ${{needs.prepare.outputs.SSH_KEY_ID}}
           
       - name: Create instance using vultr-cli
-        run: bash -eu .github/scripts/manage-vultr.sh --create-instance
+        run: bash -eux .github/scripts/manage-vultr.sh --create-instance
         env:
           VULTR_API_KEY: ${{ secrets.VULTR_API_KEY }}
           STARTUP_SCRIPT_ID: ${{ needs.prepare.outputs.STARTUP_SCRIPT_ID }}
