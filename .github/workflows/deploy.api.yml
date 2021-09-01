@@ -3,6 +3,7 @@ name: Deploy API to VPS
 on:
   push:
     branches: [ vultr ]
+  workflow_dispatch:
 
 jobs:
   deploy:

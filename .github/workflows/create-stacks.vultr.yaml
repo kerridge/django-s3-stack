@@ -49,28 +49,24 @@ jobs:
         run: |
           PRIVATE_KEY=$(cat key.txt)
           
-          cat key.txt | while read line
-          do
-            echo "::add-mask::$line"
-          done
+          # cat key.txt | while read line
+          # do
+          #   echo "::add-mask::$line"
+          # done
 
           echo "::set-output name=PRIVATE_KEY::$PRIVATE_KEY"
 
-      # TODO: REMOVE ME
-      - name: Find and replace secrets in start script
-        uses: jacobtomlinson/gha-find-replace@master
-        with:
-          find: "<SSH_PRIV>"
-          replace: "${{ steps.private-key.outputs.PRIVATE_KEY }}"
-          include: "start-script.sh"
+      - name: fuck fuck fuck
+        run: echo ${{ steps.private-key.outputs.PRIVATE_KEY }}
 
       - name: Add SSH private key to Github Secrets
         if: hashFiles('key.txt') != ''
-        uses: gliech/create-github-secret-action@v1
+        uses: philips-software/Repo-Secret-Manager@main
         with:
-          name: GH_SSH_PRIVATE_KEY
-          value: ${{ steps.private-key.outputs.PRIVATE_KEY }}
-          pa_token: ${{ secrets.GH_PA_TOKEN }}
+          action: create
+          token: ${{ secrets.GH_PA_TOKEN }}
+          secret-names: GH_SSH_PRIVATE_KEY
+          secret-values: "${{ steps.private-key.outputs.PRIVATE_KEY }}"
 
       # ============== START SCRIPT =====================
       - name: Find and replace secrets in start script
@@ -78,6 +74,13 @@ jobs:
         with:
           find: "<GH_ACCESS_TOKEN>"
           replace: "${{ secrets.GH_PA_TOKEN }}"
+          include: "start-script.sh"
+
+      - name: Find and replace secrets in start script
+        uses: jacobtomlinson/gha-find-replace@master
+        with:
+          find: "<GH_SSH_PRIVATE_KEY>"
+          replace: "${{ secrets.GH_SSH_PRIVATE_KEY }}"
           include: "start-script.sh"
 
       - name: Find and replace secrets in start script
@@ -143,8 +146,9 @@ jobs:
           VULTR_API_KEY: ${{ secrets.VULTR_API_KEY }}
 
       - name: Add instance IP address to Github Secrets
-        uses: gliech/create-github-secret-action@v1
+        uses: philips-software/Repo-Secret-Manager@main
         with:
-          name: VULTR_VPS_INSTANCE_IP
-          value: ${{ env.VULTR_VPS_INSTANCE_IP }}
-          pa_token: ${{ secrets.GH_PA_TOKEN }}
+          action: create
+          token: ${{ secrets.GH_PA_TOKEN }}
+          secret-names: VULTR_VPS_INSTANCE_IP
+          secret-values: ${{ env.VULTR_VPS_INSTANCE_IP }}

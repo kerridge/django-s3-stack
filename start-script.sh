@@ -9,7 +9,8 @@ GH_USERNAME=<GH_USERNAME>
 # Name of the application on Vultr
 VULTR_APP_NAME=<VULTR_APP_NAME>
 
-SSH_PRIV=<SSH_PRIV>
+GH_SSH_PRIVATE_KEY=<GH_SSH_PRIVATE_KEY>
+
 
 # Install git
 yum -y install git

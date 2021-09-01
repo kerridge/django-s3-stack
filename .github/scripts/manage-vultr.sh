@@ -84,7 +84,8 @@ function createInstance() {
         INSTANCE_ID=$(getResourceID "instance")
         vultr-cli instance get $INSTANCE_ID
     else
-        echo "Found existing instance with matching name, aborting deployment..."
+        echo "Found existing instance with matching label: $VULTR_APP_NAME"
+        echo "Aborting deployment..."
         exit 1
     fi
 }
@@ -93,7 +94,7 @@ function getInstanceIpAddress() {
     # Wait for instance to leave pending state
     while [ $(vultr-cli instance list | eval "awk '/$VULTR_APP_NAME/ {print \$5}'") == "pending" ];
     do
-        sleep 5
+        sleep 10
     done
 
     # Grab and output instance IP address
