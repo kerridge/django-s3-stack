@@ -71,13 +71,13 @@ function createInstance() {
         vultr-cli instance create \
             --region $VULTR_VPS_REGION \
             --plan $VULTR_VPS_PLAN \
-            --os $VULTR_VPS_OS_IMAGE \
             --app $VULTR_VPS_APP_ID \
             --label $VULTR_APP_NAME \
             --script-id $STARTUP_SCRIPT_ID \
             --ssh-keys ["$SSH_KEY_ID"]
             --ipv6 false
 
+            # --os $VULTR_VPS_OS_IMAGE \
         vultr-cli instance list
     fi
 

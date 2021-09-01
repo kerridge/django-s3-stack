@@ -56,6 +56,7 @@ jobs:
             echo "::add-mask::$line"
           done
 
+        # TODO: add if check for SSH
       - name: Add SSH private key to Github Secrets
         uses: gliech/create-github-secret-action@v1
         with:
