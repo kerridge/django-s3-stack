@@ -6,18 +6,49 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy:
+  deploy:  
+
     name: Run deploy script via SSH
     runs-on: ubuntu-latest
     steps:
+    - name: Checkout server startup script and github scripts
+      uses: Bhacaz/checkout-files@v1
+      with:
+        files: "test.sh"
+        token: ${{ secrets.GH_ACTIONS_READ_ONLY }}
+
+    - name: DO SECRET STUFF
+      id: private-key
+      run: |
+        chmod +x test.sh
+        VALUE=$(./test.sh)
+
+        # cat $VALUE | while read line
+        # do
+        #   echo "::add-mask::$line"
+        # done
+
+        # echo "::add-mask::$VALUE"
+
+        while IFS= read -r line ; 
+        do 
+          echo "::add-mask::$line"
+        done <<< "$VALUE"
+
+        echo "VALUE<<EOF" >> $GITHUB_ENV
+        echo "$VALUE" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
+
     - name: USE MY THING
-      uses: kerridge/actions-secret-manager@v1
+      uses: kerridge/actions-secret-manager@main
       with:
         action: create
         token: ${{ secrets.GH_PA_TOKEN }}
         name: YES_BITCH
-        value: "CALCIUM"
+        value: |
+          "${{ env.VALUE }}"
         
+    # "${{ steps.private-key.outputs.VALUE }}"
     # - name: executing remote ssh script using private key
     #   uses: appleboy/ssh-action@master
     #   env:
