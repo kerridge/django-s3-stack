@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: USE MY THING
-      uses: kerridge/actions-secret-manager@main
+      uses: kerridge/actions-secret-manager@v1
       with:
         action: create
         token: ${{ secrets.GH_PA_TOKEN }}
