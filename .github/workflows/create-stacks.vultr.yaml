@@ -17,10 +17,9 @@ env:
   SSH_EMAIL_ADDRESS: sammykerridge@gmail.com
 
 jobs:
-  prepare:
-    name: Prepare SSH keys and startup script
+  prepare-ssh-keys:
+    name: Create SSH keys
     outputs:
-      STARTUP_SCRIPT_ID: ${{ steps.set-ids.outputs.STARTUP_SCRIPT_ID }}
       SSH_KEY_ID: ${{ steps.set-ids.outputs.SSH_KEY_ID }}
     runs-on: ubuntu-latest
     steps:
@@ -49,24 +48,60 @@ jobs:
         run: |
           PRIVATE_KEY=$(cat key.txt)
           
-          # cat key.txt | while read line
-          # do
+          # while IFS= read -r line ; 
+          # do 
           #   echo "::add-mask::$line"
-          # done
+          # done <<< "$PRIVATE_KEY"
 
-          echo "::set-output name=PRIVATE_KEY::$PRIVATE_KEY"
+          echo "PRIV_KEY<<EOF" >> $GITHUB_ENV
+          echo "$PRIVATE_KEY" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
-      - name: fuck fuck fuck
-        run: echo ${{ steps.private-key.outputs.PRIVATE_KEY }}
+      - name: Add SSH private key to Github Secrets
+        if: hashFiles('key.txt') != ''
+        uses: kerridge/actions-secret-manager@main
+        with:
+          action: create
+          token: ${{ secrets.GH_PA_TOKEN }}
+          name: GH_SSH_PRIVATE_KEY
+          value: "SUP BITCH"
+
+      # - name: yo
+      #   run: sleep 20
 
       # - name: Add SSH private key to Github Secrets
       #   if: hashFiles('key.txt') != ''
-      #   uses: philips-software/Repo-Secret-Manager@main
+      #   uses: kerridge/actions-secret-manager@main
       #   with:
       #     action: create
       #     token: ${{ secrets.GH_PA_TOKEN }}
-      #     secret-names: GH_SSH_PRIVATE_KEY
-      #     secret-values: "${{ steps.private-key.outputs.PRIVATE_KEY }}"
+      #     name: GH_SSH_PRIVATE_KEY
+      #     value: |
+      #       "${{ env.PRIV_KEY }}"
+
+      - name: Set output for deploy job to use
+        id: set-ids
+        run: |
+          echo "::set-output name=SSH_KEY_ID::${{ env.SSH_KEY_ID }}"
+
+
+  prepare-script:
+    name: Create Startup Script
+    outputs:
+      STARTUP_SCRIPT_ID: ${{ steps.set-ids.outputs.STARTUP_SCRIPT_ID }}
+    runs-on: ubuntu-latest
+    steps:
+      # ============== PREPARE =====================
+      - name: Install vultr-cli
+        uses: techknowlogick/action-vultr@v2
+        with:
+          token: ${{ secrets.VULTR_API_KEY }}
+      
+      - name: Checkout server startup script and github scripts
+        uses: Bhacaz/checkout-files@v1
+        with:
+          files: ".github/scripts start-script.sh"
+          token: ${{ secrets.GH_ACTIONS_READ_ONLY }}
 
       # ============== START SCRIPT =====================
       - name: Find and replace secrets in start script
@@ -76,12 +111,12 @@ jobs:
           replace: "${{ secrets.GH_PA_TOKEN }}"
           include: "start-script.sh"
 
-      # - name: Find and replace secrets in start script
-      #   uses: jacobtomlinson/gha-find-replace@master
-      #   with:
-      #     find: "<GH_SSH_PRIVATE_KEY>"
-      #     replace: "${{ secrets.GH_SSH_PRIVATE_KEY }}"
-      #     include: "start-script.sh"
+      - name: Find and replace secrets in start script
+        uses: jacobtomlinson/gha-find-replace@master
+        with:
+          find: "<GH_SSH_PRIVATE_KEY>"
+          replace: "${{ secrets.GH_SSH_PRIVATE_KEY }}"
+          include: "start-script.sh"
 
       - name: Find and replace secrets in start script
         uses: jacobtomlinson/gha-find-replace@master
@@ -109,15 +144,15 @@ jobs:
         env:
           VULTR_API_KEY: ${{ secrets.VULTR_API_KEY }}
 
-      - name: Set outputs for next job to use
+      - name: Set output for deploy job to use
         id: set-ids
         run: |
           echo "::set-output name=STARTUP_SCRIPT_ID::${{ env.STARTUP_SCRIPT_ID }}"
-          echo "::set-output name=SSH_KEY_ID::${{ env.SSH_KEY_ID }}"
+
 
   deploy:
     name: Deploy Vultr VPS Instance
-    needs: prepare
+    needs: ['prepare-ssh-keys', 'prepare-script']
     runs-on: ubuntu-latest
     steps:
       # ============== PREPARE =====================
@@ -137,8 +172,8 @@ jobs:
         run: bash -eux .github/scripts/manage-vultr.sh --create-instance
         env:
           VULTR_API_KEY: ${{ secrets.VULTR_API_KEY }}
-          STARTUP_SCRIPT_ID: ${{ needs.prepare.outputs.STARTUP_SCRIPT_ID }}
-          SSH_KEY_ID: ${{ needs.prepare.outputs.SSH_KEY_ID }}
+          STARTUP_SCRIPT_ID: ${{ needs.prepare-script.outputs.STARTUP_SCRIPT_ID }}
+          SSH_KEY_ID: ${{ needs.prepare-ssh-keys.outputs.SSH_KEY_ID }}
 
       - name: Wait for instance start then get IP
         run: bash -eux .github/scripts/manage-vultr.sh --get-ip
