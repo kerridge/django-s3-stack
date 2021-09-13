@@ -27,7 +27,7 @@ function createSshKey() {
         PRIVATE_KEY="$(cat ~/.ssh/id_ed25519)"
 
         # Write key to file for future steps to use
-        echo $PRIVATE_KEY >> key.txt
+        echo "$PRIVATE_KEY" >> key.txt
 
         vultr-cli ssh-key create \
             --key "$PUBLIC_KEY" \

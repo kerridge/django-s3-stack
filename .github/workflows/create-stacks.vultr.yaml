@@ -46,7 +46,8 @@ jobs:
         id: private-key
         if: hashFiles('key.txt') != ''
         run: |
-          PRIVATE_KEY=$(cat key.txt)
+          PRIVATE_KEY="$(cat key.txt)"
+          echo "private boiiiii: $PRIVATE_KEY"
           
           # while IFS= read -r line ; 
           # do 
