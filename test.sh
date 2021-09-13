@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# TODO: rewrite history
 # read -r -d '' VALUE << EOM
 # -----BEGIN OPENSSH PRIVATE KEY-----
 # b3BlbnNzaC1rZXktdjEAAASABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW
@@ -10,14 +11,6 @@
 # -----END OPENSSH PRIVATE KEY-----
 # EOM
 
-# KET="-----BEGIN OPENSSH PRIVATE KEY----- b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW QyNTUxOQAAACAi+xonjkSeRKHJjeZueY8LS+mkXUlYJWszCoOuHbBFvgAAAKCYpAGfmKQB nwAAAAtzc2gtZWQyNTUxOQAAACAi+xonjkSeRKHJjeZueY8LS+mkXUlYJWszCoOuHbBFvg AAAEDn+spixd8OLvi/Ny9c0BV0ixKgqWpmBnjTmAc/sK1sciL7GieORJ5EocmN5m55jwtL 6aRdSVglazMKg64dsEW+AAAAF3NhbW15a2VycmlkZ2VAZ21haWwuY29tAQIDBAUG -----END OPENSSH PRIVATE KEY-----"
-
-# MULTILINE_KEY=$(echo $KET | sed \
-#     -e "s/-----BEGIN OPENSSH PRIVATE KEY-----/&\n/"\
-#     -e "s/-----END OPENSSH PRIVATE KEY-----/\n&/"\
-    # -e "s/\S\{70\}/&\n/g")
-
-# echo "$MULTILINE_KEY"
 echo "YOOOOOOOOO"
 
 # # Returns a UUID for the Vultr resource requested
