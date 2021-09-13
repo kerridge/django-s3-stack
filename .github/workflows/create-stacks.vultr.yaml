@@ -66,8 +66,8 @@ jobs:
           name: GH_SSH_PRIVATE_KEY
           value: "SUP BITCH"
 
-      # - name: yo
-      #   run: sleep 20
+      - name: yo
+        run: sleep 30
 
       # - name: Add SSH private key to Github Secrets
       #   if: hashFiles('key.txt') != ''
@@ -87,6 +87,7 @@ jobs:
 
   prepare-script:
     name: Create Startup Script
+    needs: prepare-ssh-keys
     outputs:
       STARTUP_SCRIPT_ID: ${{ steps.set-ids.outputs.STARTUP_SCRIPT_ID }}
     runs-on: ubuntu-latest
