@@ -13,7 +13,6 @@ env:
   VULTR_APP_NAME: django-vue-stack
   SSH_EMAIL_ADDRESS: sammykerridge@gmail.com
 
-  
 jobs:
   prepare-script:
     name: Create Startup Script
@@ -34,39 +33,39 @@ jobs:
           token: ${{ secrets.GH_ACTIONS_READ_ONLY }}
 
       # ============== START SCRIPT =====================
-      - name: Find and replace secrets in start script
+      - name: Find and replace <GH_ACCESS_TOKEN> in start script
         uses: jacobtomlinson/gha-find-replace@master
         with:
           find: "<GH_ACCESS_TOKEN>"
           replace: "${{ secrets.GH_PA_TOKEN }}"
           include: "start-script.sh"
 
-      - name: Find and replace secrets in start script
+      - name: Find and replace <GH_SSH_PRIVATE_KEY> in start script
         uses: jacobtomlinson/gha-find-replace@master
         with:
           find: "<GH_SSH_PRIVATE_KEY>"
           replace: "${{ secrets.GH_SSH_PRIVATE_KEY }}"
           include: "start-script.sh"
 
-      - name: Find and replace secrets in start script
+      - name: Find and replace <GH_SSH_URL> in start script
         uses: jacobtomlinson/gha-find-replace@master
         with:
           find: "<GH_SSH_URL>"
           replace: "${{ github.event.repository.ssh_url }}"
           include: "start-script.sh"
 
-      - name: Find and replace secrets in start script
+      - name: Find and replace <GH_USERNAME> in start script
         uses: jacobtomlinson/gha-find-replace@master
         with:
           find: "<GH_USERNAME>"
           replace: "${{ github.repository_owner }}"
           include: "start-script.sh"
 
-      - name: Find and replace secrets in start script
+      - name: Find and replace <VULTR_APP_NAME> in start script
         uses: jacobtomlinson/gha-find-replace@master
         with:
           find: "<VULTR_APP_NAME>"
-          replace: "LESGOOOO"
+          replace: "${{ env.VULTR_APP_NAME }}"
           include: "start-script.sh"
 
       - name: Encode and upload start script to Vultr
