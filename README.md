@@ -1,7 +1,16 @@
 # django-s3-stack
-https://excalidraw.com/#json=5671731079413760,Vi7BYErCS7GbfuSr37uaFw
 
-https://excalidraw.com/#json=5423642091454464,gxzMZ1UnjIQakdN9Mgim2g
+![image](app-stack.png)
+
+The Django API, Nginx reverse proxy, and Postgres db are all deployed on the same Vultr VPS instance. This is only a website template designed to service a small amount of traffic and few concurrent connections. This solution has a tradeoff of not being able to easily scale out due to the `db` and `api` being deployed on the same server. If you wanted to increase the traffic the `api` can process then you'd want to move the `db` instance off the server. 
+
+It would be easier to use AWS or GCP for this as deployment, routing, and managing dockerized apps are all much easier. However I wanted to build something that uses an extremely cheap VPS option so as to make it accessible for smaller clients. The base Vultr plan can run a decent server for $7 a month, which can service 1TB of bandwidth, has a 25GB SSD, 1 dedicated CPU, and they even have Sydney servers!
+
+All of the server deployment, app management/updating, certificate management, secret management, s3 deployment, etc. are all handled through customs scripts which run inside GitHub Actions CICD.
+
+[Stack architecture](https://excalidraw.com/#json=6382989575454720,cvpix8FhYb-QelFCjYZW-A)
+
+[GitHub Actions architecture (out of date)](https://excalidraw.com/#json=5423642091454464,gxzMZ1UnjIQakdN9Mgim2g)
 
 ## UI 
 - VueJS
@@ -17,7 +26,22 @@ This api is made with the **Django REST framework** combined with **Wagtail CMS*
 
 The application is fully Dockerized with dev and prod configurations.
 
-## Developer setup
+**Deployed on:**
+- Vultr VPS Server
+
+## Routing
+- Nginx reverse proxy
+
+## DB
+- Postgres
+
+**Deployed on:**
+- Vultr VPS Server
+
+
+------------------
+
+## Developer Setup
 
 ### You will need
 - Docker
