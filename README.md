@@ -14,7 +14,7 @@ All of the server deployment, app management/updating, certificate management, s
 
 [GitHub Actions architecture (out of date)](https://excalidraw.com/#json=5423642091454464,gxzMZ1UnjIQakdN9Mgim2g)
 
-## UI 
+## UI (WIP)
 - VueJS
 - Antt Design
 - Bootstrap
