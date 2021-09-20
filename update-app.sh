@@ -1,8 +1,6 @@
 # !/bin/bash
 
-# GITHUB_REPOSITORY_CLONE_URL=$1
 # GITHUB_REPOSITORY_NAME=$2
-# GITHUB_USERNAME=$3
 
 # Change working directory
 ROOT_DIR="/home/docker/"

@@ -19,7 +19,7 @@ firewall-cmd --add-service=http --permanent
 firewall-cmd --reload
 
 # Assert http service was added
-firewall-cmd --list-all | grep http
+# firewall-cmd --list-all | grep http
 
 
 # https://linuxhint.com/open-port-80-centos/
@@ -62,12 +62,11 @@ Host github.com-$GH_USERNAME
  """ >> ~/.ssh/config
 
 
-ROOT_DIR="/home/docker/"
-# WORK_DIR=$ROOT_DIR
-
 # Change working directory
+ROOT_DIR="/home/docker/"
 cd $ROOT_DIR
 
+# Add github to known ssh hosts, this might be susceptible to a man in the middle attack
 if [ ! -n "$(grep "^github.com " ~/.ssh/known_hosts)" ];
 then 
     ssh-keyscan github.com >> ~/.ssh/known_hosts 2>/dev/null; 

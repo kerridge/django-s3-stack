@@ -48,7 +48,7 @@ jobs:
         run: |
           PRIVATE_KEY="$(cat key.txt)"
           echo "private boiiiii: $PRIVATE_KEY"
-          
+
           # while IFS= read -r line ; 
           # do 
           #   echo "::add-mask::$line"
@@ -57,6 +57,11 @@ jobs:
           echo "PRIV_KEY<<EOF" >> $GITHUB_ENV
           echo "$PRIVATE_KEY" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
+
+          echo "::set-output name=PRIVATE_KEY::$PRIVATE_KEY"
+
+      - name: TEST mask
+        run: echo "KEY ${{ steps.private-key.outputs.PRIVATE_KEY }}"
 
       - name: Add SSH private key to Github Secrets
         if: hashFiles('key.txt') != ''

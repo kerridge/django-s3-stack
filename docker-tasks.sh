@@ -96,6 +96,10 @@ stopProductionContainer () {
 
 followProductionLogs () {
     docker compose logs app --follow
+    # while true;
+    # do 
+    #     echo "FUCK"
+    # done & sleep 1 ; kill $!
 }
 
 
