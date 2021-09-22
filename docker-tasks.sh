@@ -86,24 +86,24 @@ pushImage () {
 # ----------------------- PRODUCTION --------------------------
 # -------------------------------------------------------------
 buildProductionImage () {
-    docker compose -f $PRODUCTION_DOCKER_COMPOSE_FILE build app
+    docker-compose -f $PRODUCTION_DOCKER_COMPOSE_FILE build app
 }
 
 # runs production Docker container in detached mode
 runProductionContainer () {
-    docker compose -f $PRODUCTION_DOCKER_COMPOSE_FILE up app --detach
+    docker-compose -f $PRODUCTION_DOCKER_COMPOSE_FILE up --detach app
 }
 
 # stops all running docker-compose containers
 stopProductionContainer () {
-    docker compose -f $PRODUCTION_DOCKER_COMPOSE_FILE down app
+    docker-compose -f $PRODUCTION_DOCKER_COMPOSE_FILE stop app
 }
 
 followProductionLogs () {
-    while true;
-    do 
-        docker compose logs app --follow
-    done & sleep 60 ; kill $!
+    docker-compose logs --follow app
+    # while true;
+    # do 
+    # done & sleep 60 ; kill $!
 }
 
 

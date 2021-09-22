@@ -2,7 +2,7 @@ name: Deploy API to VPS
 
 on:
   push:
-    branches: [ vultr ]
+    branches: [ main ]
   workflow_dispatch:
 
 env:
@@ -31,4 +31,5 @@ jobs:
         script_stop: true
         script: |
           cd ${{ env.PROJ_DIR }}
+          git pull origin main
           ${{ env.DEPLOY_SCRIPT }} ${{ github.event.repository.name }}

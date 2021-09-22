@@ -7,11 +7,13 @@ on:
     tags: [ 'v*.*.*' ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
 
 env:
   REGISTRY: docker.io
   IMAGE_NAME: ${{ secrets.DOCKER_HUB_USERNAME }}/django-s3-stack
   TRIGGER_DIRECTORIES: api .github util
+  VULTR_APP_NAME: django-vue-stack
 
 jobs:
   check:
@@ -99,21 +101,23 @@ jobs:
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
 
-  publish:
-    name: Publish to Digital Ocean
+  deploy:
+    name: Run deploy script via SSH
     needs: build
     runs-on: ubuntu-latest
-    steps: 
-      - name: Checkout app.yaml
-        uses: Bhacaz/checkout-files@v1
-        with:
-          files: api/app.yaml
-          token: ${{ secrets.GH_ACTIONS_READ_ONLY }}
-        
-      - name: Publish app to Digital Ocean
-        if: github.event_name != 'pull_request'
-        uses: jjst/action-digitalocean-deploy-app@v2
-        with:
-          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-          app-id: ${{ secrets.DIGITALOCEAN_APP_ID }}
-          spec: api/app.yaml
+    steps:
+    - name: executing remote ssh script using private key
+      uses: appleboy/ssh-action@master
+      env:
+        USER: root
+        PROJ_DIR: /home/docker/django-s3-stack
+        DEPLOY_SCRIPT: ./update-app.sh
+      with:
+        host: ${{ secrets.VULTR_VPS_INSTANCE_IP }}
+        username: ${{ env.USER }}
+        key: ${{ secrets.GH_SSH_PRIVATE_KEY }}
+        script_stop: true
+        script: |
+          cd ${{ env.PROJ_DIR }}
+          git pull origin main
+          ${{ env.DEPLOY_SCRIPT }} ${{ github.event.repository.name }}

@@ -3,7 +3,22 @@ version: '3.7'
 services:
   app:
     image: samkedge/django-s3-stack:main
+    pull_policy: always
     ports:
     - "80:80"
     env_file:
     - ./api/.env.dev
+    depends_on:
+    - db
+
+  db:
+    image: postgres:12.0-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=hello_django
+      - POSTGRES_PASSWORD=hello_django
+      - POSTGRES_DB=hello_django_dev
+    
+volumes:
+  postgres_data:

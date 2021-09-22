@@ -2,27 +2,20 @@
 
 GITHUB_REPOSITORY_NAME=$1
 
-echo "YEW: $GITHUB_REPOSITORY_NAME"
-
 # Change working directory
 ROOT_DIR="/home/docker/"
 WORK_DIR="$ROOT_DIR/$GITHUB_REPOSITORY_NAME"
+PRODUCTION_DOCKER_COMPOSE_FILE="docker-compose.server.yml"
 
 cd $WORK_DIR
 
 # docker login
-pwd
 
-# Pull latest repo changes in case our scripts updated
-git pull origin main
+docker-compose -f $PRODUCTION_DOCKER_COMPOSE_FILE stop
 
-# # Stop currently running containers
-# ./docker-tasks.sh --prod stop
+docker-compose -f $PRODUCTION_DOCKER_COMPOSE_FILE pull app
 
-# Start and Pull new containers
-./docker-tasks.sh --prod run
-# Follow container logs
-./docker-tasks.sh --prod logs
+docker-compose -f $PRODUCTION_DOCKER_COMPOSE_FILE up --detach
 
 # # Health check new containers
 #     # if healthy
