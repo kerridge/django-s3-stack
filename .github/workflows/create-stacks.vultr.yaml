@@ -1,12 +1,7 @@
-name: Create VPS instance using VultrCLI
+name: Create Vultr VPS instance
 
 on:
   workflow_dispatch:
-    inputs:
-      logLevel:
-        description: 'Log level'     
-        required: false
-        default: 'warning'
 
 env:
   VULTR_VPS_REGION: syd
@@ -47,14 +42,12 @@ jobs:
         if: hashFiles('key.txt') != ''
         run: |
           PRIVATE_KEY="$(cat key.txt)"
-          echo "private boiiiii: $PRIVATE_KEY"
 
-          echo "::add-mask::$PRIVATE_KEY"
-
-          # while IFS= read -r line ; 
-          # do 
-          #   echo "::add-mask::$line"
-          # done <<< "$PRIVATE_KEY"
+          # mask multiline variable
+          while IFS= read -r line ; 
+          do
+            echo "::add-mask::$line"
+          done <<< "$PRIVATE_KEY"
 
           echo "PRIV_KEY<<EOF" >> $GITHUB_ENV
           echo "$PRIVATE_KEY" >> $GITHUB_ENV
