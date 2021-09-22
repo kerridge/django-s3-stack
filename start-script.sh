@@ -18,31 +18,12 @@ firewall-cmd --add-service=http --permanent
 # Restart firewalld for changes to take effect
 firewall-cmd --reload
 
-# Assert http service was added
-# firewall-cmd --list-all | grep http
-
-
-# https://linuxhint.com/open-port-80-centos/
-# Assert port was opened
-# https://www.thegeekdiary.com/how-to-open-a-ports-in-centos-rhel-7/
-# lsof -i -P |grep http
-
-# # Public Key generated on personal machine
-# REMOTE_PUBLIC_KEY="" # Matching Private Key should be stored in Github Secrets
-
-# # Add public key to allow SSH access to this machine from Github Actions
-# mkdir -p /root/.ssh
-# chmod 700 /root/.ssh
-# echo ssh-rsa $REMOTE_PUBLIC_KEY > /root/.ssh/authorized_keys
-# chmod 600 /root/.ssh/authorized_keys
-
 # Generate new SSH key pair for using Git
 ssh-keygen \
     -t ed25519 \
     -f ~/.ssh/id_ed25519 \
     -C "sammykerridge@gmail.com" \
     -q -N ""
-
 
 # Copy public key
 VPS_PUBLIC_KEY=`cat ~/.ssh/id_ed25519.pub`

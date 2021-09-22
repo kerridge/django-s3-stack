@@ -1,8 +1,8 @@
-name: Build & Deploy
+name: Build & Push Image
 
 on:
   push:
-    branches: [ digitalocean ]
+    branches: [ main ]
     # Publish semver tags as releases.
     tags: [ 'v*.*.*' ]
   pull_request:
@@ -13,7 +13,6 @@ env:
   REGISTRY: docker.io
   IMAGE_NAME: ${{ secrets.DOCKER_HUB_USERNAME }}/django-s3-stack
   TRIGGER_DIRECTORIES: api .github util
-  VULTR_APP_NAME: django-vue-stack
 
 jobs:
   check:
@@ -100,24 +99,3 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
-
-  deploy:
-    name: Run deploy script via SSH
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-    - name: executing remote ssh script using private key
-      uses: appleboy/ssh-action@master
-      env:
-        USER: root
-        PROJ_DIR: /home/docker/django-s3-stack
-        DEPLOY_SCRIPT: ./update-app.sh
-      with:
-        host: ${{ secrets.VULTR_VPS_INSTANCE_IP }}
-        username: ${{ env.USER }}
-        key: ${{ secrets.GH_SSH_PRIVATE_KEY }}
-        script_stop: true
-        script: |
-          cd ${{ env.PROJ_DIR }}
-          git pull origin main
-          ${{ env.DEPLOY_SCRIPT }} ${{ github.event.repository.name }}
