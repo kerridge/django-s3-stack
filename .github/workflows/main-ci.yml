@@ -1,8 +1,6 @@
 name: Build & Deploy
 
 on:
-  schedule:
-    - cron: '34 0 * * *'
   push:
     branches: [ digitalocean ]
     # Publish semver tags as releases.
