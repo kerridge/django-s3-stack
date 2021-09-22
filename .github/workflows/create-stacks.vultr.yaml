@@ -49,6 +49,8 @@ jobs:
           PRIVATE_KEY="$(cat key.txt)"
           echo "private boiiiii: $PRIVATE_KEY"
 
+          echo "::add-mask::$PRIVATE_KEY"
+
           # while IFS= read -r line ; 
           # do 
           #   echo "::add-mask::$line"
