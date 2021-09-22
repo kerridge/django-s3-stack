@@ -134,3 +134,4 @@ dmypy.json
 **/static/css/
 **/static/js/
 .DS_Store
+**/migrations/**

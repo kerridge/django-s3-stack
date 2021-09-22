@@ -27,6 +27,7 @@ DEFAULT_AUTO_FIELD='django.db.models.BigAutoField'
 INSTALLED_APPS = [
     'home',
     'search',
+    'todo',
 
     'wagtail.contrib.forms',
     'wagtail.contrib.redirects',
