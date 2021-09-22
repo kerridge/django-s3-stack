@@ -20,7 +20,8 @@ showUsage () {
 }
 
 # Variables
-PRODUCTION_DOCKER_COMPOSE_FILE="docker-compose.prod.yml"
+PRODUCTION_DOCKER_COMPOSE_FILE="docker-compose.server.yml"
+
 IMAGE_NAME="winterwindsoftware/simple-express-app"
 CONTAINER_NAME="simple-express-app_dev"
 REPOSITORY_PATH="856405715088.dkr.ecr.us-east-1.amazonaws.com" #TODO: set this to the path of your ECS repository
@@ -31,11 +32,15 @@ CONTAINER_PORT=80
 # Set environment target
 case "$1" in
     -p|--prod)
+        echo "-------------------------------------------------------------"
         echo "------------ Production Docker Configuration ----------------"
+        echo "-------------------------------------------------------------"
         ENVIRONMENT="prod"
     ;;
     -d|--dev)
+        echo "-------------------------------------------------------------"
         echo "------------ Development Docker Configuration ----------------"
+        echo "-------------------------------------------------------------"
         ENVIRONMENT="dev"
     ;;
     *)
@@ -95,11 +100,10 @@ stopProductionContainer () {
 }
 
 followProductionLogs () {
-    docker compose logs app --follow
-    # while true;
-    # do 
-    #     echo "FUCK"
-    # done & sleep 1 ; kill $!
+    while true;
+    do 
+        docker compose logs app --follow
+    done & sleep 60 ; kill $!
 }
 
 

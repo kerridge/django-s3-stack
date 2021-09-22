@@ -55,9 +55,6 @@ jobs:
 
           echo "::set-output name=PRIVATE_KEY::$PRIVATE_KEY"
 
-      - name: TEST mask
-        run: echo "KEY ${{ steps.private-key.outputs.PRIVATE_KEY }}"
-
       - name: Add SSH private key to Github Secrets
         if: hashFiles('key.txt') != ''
         uses: kerridge/actions-secret-manager@main
