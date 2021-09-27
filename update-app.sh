@@ -11,8 +11,6 @@ cd $WORK_DIR
 
 # docker login
 
-docker-compose -f $PRODUCTION_DOCKER_COMPOSE_FILE stop
-
 docker-compose -f $PRODUCTION_DOCKER_COMPOSE_FILE pull app
 
 docker-compose -f $PRODUCTION_DOCKER_COMPOSE_FILE up --detach

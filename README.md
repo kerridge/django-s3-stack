@@ -2,7 +2,7 @@
 
 This is a template web app for deploying a static VueJS SPA to S3 with CloudFront hosting, and a Dockerized headless Django REST API to a Vultr VPS instance running the CentOS Linix distro. All deployment is automated and handled through bash scripts running inside Github Actions
 
-![image](app-stack.png)
+![image](docs/app-stack.png)
 
 The Django API, Nginx reverse proxy, and Postgres db are all deployed on the same Vultr VPS instance. This is only a website template designed to service a small amount of traffic and few concurrent connections. This solution has a tradeoff of not being able to easily scale out due to the `db` and `api` being deployed on the same server. If you wanted to increase the traffic the `api` can process then you'd want to move the `db` instance off the server. 
 

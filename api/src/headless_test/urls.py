@@ -10,9 +10,8 @@ from search import views as search_views
 
 from .api import api_router, router
 
-from django.conf.urls import include, url
-from django.contrib.staticfiles.views import serve
-from django.views.generic import RedirectView
+from django.conf.urls import include
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 
 urlpatterns = [
@@ -23,6 +22,10 @@ urlpatterns = [
 
     path('api/', api_router.urls),
     path('api/v2/', include(router.urls)),
+
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 
     re_path(r'^', include(wagtail_urls)),
 ]

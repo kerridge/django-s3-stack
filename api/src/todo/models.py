@@ -26,7 +26,7 @@ class Todo(BaseMetatdataModel):
     todo_description = models.CharField(max_length=200, blank=True, default='')
 
     def __str__(self) -> str:
-        return self.todo_title        
+        return self.todo_title
 
     todo_panels = [
         FieldPanel('todo_title'),
