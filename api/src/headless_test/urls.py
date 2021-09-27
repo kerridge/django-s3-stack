@@ -12,7 +12,7 @@ from .api import api_router, router
 
 from django.conf.urls import include
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
-
+    
 
 urlpatterns = [
     path('django-admin/', admin.site.urls),
@@ -20,14 +20,8 @@ urlpatterns = [
 
     path('search/', search_views.search, name='search'),
 
-    path('api/', api_router.urls),
+    path('api/v2/', api_router.urls),
     path('api/v2/', include(router.urls)),
-
-    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
-    path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-    path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
-
-    re_path(r'^', include(wagtail_urls)),
 ]
 
 
@@ -39,3 +33,13 @@ if settings.DEBUG:
     urlpatterns += staticfiles_urlpatterns()
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
+    # Only show swagger UI in debug
+    urlpatterns += [
+        path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+        path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+        path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc')
+    ]
+
+
+# Register Wagtail URLS last
+urlpatterns += [re_path(r'^', include(wagtail_urls))]
