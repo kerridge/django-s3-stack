@@ -1,7 +1,5 @@
 # !/bin/bash
 
-GITHUB_REPOSITORY_NAME=$1
-
 # Change working directory
 ROOT_DIR="/home/docker/"
 WORK_DIR="$ROOT_DIR/$GITHUB_REPOSITORY_NAME"
@@ -14,13 +12,32 @@ cd $WORK_DIR
 docker-compose -f $PRODUCTION_DOCKER_COMPOSE_FILE pull app
 
 # TODO: this is a tightly coupled approach, look at using an env file
+# if [ -e .env.docker ]; then
+#     echo "exists"
+# else
+
+# rm .env.docker
+# touch .env.docker
+# echo "AWS_STORAGE_BUCKET_NAME=$AWS_STORAGE_BUCKET_NAME" >> .env.docker
+# echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> .env.docker
+# echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> .env.docker
+# echo "AWS_S3_REGION_NAME=$AWS_S3_REGION_NAME" >> .env.docker
+
+echo "BUCKET: $AWS_STORAGE_BUCKET_NAME"
+echo "REGION: $AWS_S3_REGION_NAME"
+
+AWS_STORAGE_BUCKET_NAME="$AWS_STORAGE_BUCKET_NAME" \
+AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID" \
+AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY" \
+AWS_S3_REGION_NAME="$AWS_S3_REGION_NAME" \
 docker-compose \
     -f $PRODUCTION_DOCKER_COMPOSE_FILE \
-    -e AWS_STORAGE_BUCKET_NAME=$AWS_STORAGE_BUCKET_NAME \
-    -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
-    -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
-    -e AWS_S3_REGION_NAME=$AWS_S3_REGION_NAME \
     up --detach
+
+    # -e AWS_STORAGE_BUCKET_NAME=$AWS_STORAGE_BUCKET_NAME \
+    # -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+    # -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+    # -e AWS_S3_REGION_NAME=$AWS_S3_REGION_NAME \
 
     # -e SQL_ENGINE=$SQL_ENGINE
     # -e DATABASE=$DATABASE \
