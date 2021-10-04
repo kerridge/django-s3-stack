@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# TODO: rewrite history
+# TODO: rewrite history, this key is fake btw lol
 # read -r -d '' VALUE << EOM
 # -----BEGIN OPENSSH PRIVATE KEY-----
 # b3BlbnNzaC1rZXktdjEAAASABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW

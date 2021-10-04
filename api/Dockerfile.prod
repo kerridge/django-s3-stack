@@ -19,6 +19,10 @@ RUN pip install --upgrade pip
 COPY src/requirements.txt .
 RUN pip install -r requirements.txt
 
+# TODO: remove
+COPY ./src/requirements.dev.txt .
+RUN pip install -r requirements.dev.txt
+
 # copy in project
 COPY src src/
 
