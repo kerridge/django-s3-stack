@@ -7,6 +7,15 @@ on:
     types:
       - completed
 
+env:
+  USER: root
+  PROJ_DIR: /home/docker/django-s3-stack
+  DEPLOY_SCRIPT: ./update-app.sh
+  AWS_STORAGE_BUCKET_NAME: django-vue-stack
+  AWS_S3_REGION_NAME: ap-southeast-2
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
 
 jobs:
   deploy:
@@ -16,16 +25,8 @@ jobs:
       github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
-    - name: executing remote ssh script using private key
+    - name: Set environment secrets via ssh
       uses: appleboy/ssh-action@master
-      env:
-        USER: root
-        PROJ_DIR: /home/docker/django-s3-stack
-        DEPLOY_SCRIPT: ./update-app.sh
-        AWS_STORAGE_BUCKET_NAME: django-vue-stack
-        AWS_S3_REGION_NAME: ap-southeast-2
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       with:
         host: ${{ secrets.VULTR_VPS_INSTANCE_IP }}
         username: ${{ env.USER }}
@@ -33,10 +34,28 @@ jobs:
         script_stop: true
         script: |
           cd ${{ env.PROJ_DIR }}
+
+          if [ -f .env.api ]; then
+            rm .env.api
+          fi
+
+          echo AWS_STORAGE_BUCKET_NAME=${{ env.AWS_STORAGE_BUCKET_NAME }} >> .env.api
+          echo AWS_ACCESS_KEY_ID=${{ env.AWS_ACCESS_KEY_ID }} >> .env.api
+          echo AWS_SECRET_ACCESS_KEY=${{ env.AWS_SECRET_ACCESS_KEY }} >> .env.api
+          echo AWS_S3_REGION_NAME=${{ env.AWS_S3_REGION_NAME }} >> .env.api
+          echo GITHUB_REPOSITORY_NAME=${{ github.event.repository.name }} >> .env.api
+
+    - name: Run deploy script via ssh
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.VULTR_VPS_INSTANCE_IP }}
+        username: ${{ env.USER }}
+        key: ${{ secrets.GH_SSH_PRIVATE_KEY }}
+        script_stop: true
+        script: |
+          cd ${{ env.PROJ_DIR }}
+
           git pull origin main
-          export AWS_STORAGE_BUCKET_NAME=${{ env.AWS_STORAGE_BUCKET_NAME }}
-          export AWS_S3_REGION_NAME=${{ env.AWS_S3_REGION_NAME }}
-          export AWS_ACCESS_KEY_ID=${{ env.AWS_ACCESS_KEY_ID }}
-          export AWS_SECRET_ACCESS_KEY=${{ env.AWS_SECRET_ACCESS_KEY }}
+          
           export GITHUB_REPOSITORY_NAME=${{ github.event.repository.name }}
           ${{ env.DEPLOY_SCRIPT }}
