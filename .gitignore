@@ -130,9 +130,7 @@ dmypy.json
 .pyre/
 
 .env.prod
-**/static/**
-**/static/css/
-**/static/js/
+**/src/static/**
 .DS_Store
 **/migrations/**
 
